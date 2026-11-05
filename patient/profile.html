@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>আমার স্বাস্থ্য প্রোফাইল (My Profile) | CarePoint Patient Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar patient-sidebar" id="patient-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="patient-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-person-badge text-primary me-2"></i>আমার ব্যক্তিগত ও স্বাস্থ্য প্রোফাইল</h4>
+            <p class="text-muted small mb-0">অনন্য স্বাস্থ্য পরিচয়পত্র (UHID), ঠিকানা, রক্তের গ্রুপ ও এলার্জি রেকর্ড</p>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="hms-card p-4 text-center">
+              <div class="user-avatar-sm bg-primary mx-auto mb-3" style="width:75px; height:75px; font-size:2rem;">
+                <i class="bi bi-person"></i>
+              </div>
+              <h5 class="fw-bold text-hms-navy mb-1" id="p-name">মো. রফিকুল ইসলাম</h5>
+              <div class="text-muted small mb-2" id="p-name-en">Md. Rafiqul Islam</div>
+              <span class="badge bg-primary text-uppercase mb-3" id="p-uhid">CPH-2026-0001</span>
+              <div class="p-3 bg-light rounded-3 text-start small">
+                <div><strong>রক্তের গ্রুপ:</strong> <span class="badge bg-danger" id="p-blood">B+</span></div>
+                <div class="mt-1"><strong>বয়স/লিঙ্গ:</strong> <span id="p-age-gender">৫২ বছর / Male</span></div>
+                <div class="mt-1"><strong>মোবাইল:</strong> <span id="p-phone">+880 1819-223344</span></div>
+                <div class="mt-1"><strong>নিবন্ধন তারিখ:</strong> ২০২৬-০১-১০</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-8">
+            <div class="hms-card p-4">
+              <h5 class="fw-bold text-hms-navy mb-3 border-bottom pb-2">প্রোফাইল তথ্য আপডেট ফরম</h5>
+              <form onsubmit="handleProfileUpdate(event)">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">জরুরি যোগাযোগের নাম</label>
+                    <input type="text" class="form-control" id="p-emerg-name" value="সুলতানা ইসলাম (স্ত্রী)">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">জরুরি মোবাইল নম্বর</label>
+                    <input type="tel" class="form-control" id="p-emerg-phone" value="+880 1819-223345">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">বর্তমান আবাসিক ঠিকানা</label>
+                    <input type="text" class="form-control" id="p-address" value="বাড়ি ১২, রোড ৫, ধানমন্ডি, ঢাকা">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-danger">ড্রাগ / খাদ্য এলার্জি</label>
+                    <input type="text" class="form-control" id="p-allergies" value="Penicillin, Dust">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">দীর্ঘমেয়াদী রোগ (Chronic Conditions)</label>
+                    <input type="text" class="form-control" id="p-chronic" value="Hypertension, Type-2 Diabetes">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-hms-primary mt-4">তথ্য সংরক্ষণ করুন</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderPatientSidebar('profile');
+      HMS.UI.renderPatientTopbar('আমার প্রোফাইল');
+    });
+
+    function handleProfileUpdate(e) {
+      e.preventDefault();
+      HMS.UI.showToast('আপনার প্রোফাইল তথ্য সফলভাবে আপডেট হয়েছে!', 'success');
+    }
+  </script>
+</body>
+</html>

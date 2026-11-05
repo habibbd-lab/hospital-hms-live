@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ব্লাড ব্যাংক ব্যবস্থাপনা (Blood Bank) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-droplet-fill text-danger me-2"></i>ব্লাড ব্যাংক ব্যবস্থাপনা (Blood Bank)</h4>
+            <p class="text-muted small mb-0">রক্তের গ্রুপভিত্তিক লাইভ স্টক, রক্তদাতা নিবন্ধন ও নিরাপদ পরিসঞ্চালন রেকর্ড</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-danger btn-sm" onclick="registerDonor()">
+              <i class="bi bi-person-plus me-1"></i>নতুন রক্তদাতা নিবন্ধন
+            </button>
+          </div>
+        </div>
+
+        <!-- Blood Stock Matrix -->
+        <div class="row g-3 mb-4" id="blood-stock-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Registered Blood Donors & Requests Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-people text-danger me-2"></i>নিবন্ধিত রক্তদাতাদের তালিকা</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>দাতার নাম</th>
+                  <th>রক্তের গ্রুপ</th>
+                  <th>মোবাইল নম্বর</th>
+                  <th>সর্বশেষ রক্তদানের তারিখ</th>
+                  <th>উপযুক্ততা (Eligibility)</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="donors-table-body">
+                <tr>
+                  <td><strong>তানভীর আহমেদ</strong></td>
+                  <td><span class="badge bg-danger">O+</span></td>
+                  <td>+880 1711-889911</td>
+                  <td>২০২৬-০৮-১৫ (৩ মাস পূর্বে)</td>
+                  <td><span class="badge bg-success">উপযুক্ত (Eligible)</span></td>
+                  <td class="text-end no-export"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="HMS.UI.showToast('ব্লাড রিকুইজিশন এসএমএস পাঠানো হয়েছে!', 'success')">যোগাযোগ করুন</button></td>
+                </tr>
+                <tr>
+                  <td><strong>আরিফুল ইসলাম</strong></td>
+                  <td><span class="badge bg-danger">A+</span></td>
+                  <td>+880 1819-554433</td>
+                  <td>২০২৬-১০-১০ (১ মাস পূর্বে)</td>
+                  <td><span class="badge bg-secondary">বিশ্রামে (Wait 2 months)</span></td>
+                  <td class="text-end no-export"><button class="btn btn-sm btn-outline-secondary py-0 px-2" disabled>অযোগ্য</button></td>
+                </tr>
+                <tr>
+                  <td><strong>মাহমুদা খাতুন</strong></td>
+                  <td><span class="badge bg-danger">B+</span></td>
+                  <td>+880 1612-443322</td>
+                  <td>২০২৬-০৬-২০ (৫ মাস পূর্বে)</td>
+                  <td><span class="badge bg-success">উপযুক্ত (Eligible)</span></td>
+                  <td class="text-end no-export"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="HMS.UI.showToast('ব্লাড রিকুইজিশন এসএমএস পাঠানো হয়েছে!', 'success')">যোগাযোগ করুন</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('blood-bank');
+      HMS.UI.renderAdminTopbar('ব্লাড ব্যাংক', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'ব্লাড ব্যাংক', url: '#' }]);
+      renderBloodStock();
+    });
+
+    function renderBloodStock() {
+      const stock = HMS.Storage.getCollection('blood_bank');
+      const grid = document.getElementById('blood-stock-grid');
+      grid.innerHTML = stock.map(s => `
+        <div class="col-xl-3 col-sm-6">
+          <div class="hms-card p-3 text-center border-danger border-opacity-25 bg-white">
+            <span class="badge bg-danger fs-5 mb-1">${s.group}</span>
+            <div class="display-6 fw-bold text-hms-navy">${s.units_available}</div>
+            <small class="text-muted d-block">ইউনিট / ব্যাগ সংরক্ষিত</small>
+            <div class="mt-2 pt-2 border-top small d-flex justify-content-between text-muted" style="font-size:0.75rem;">
+              <span>${s.component}</span>
+              <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="issueBlood('${s.group}')">ইস্যু করুন</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function issueBlood(group) {
+      if (confirm(`${group} রক্তের ব্যাগ কি অপারেশন বা রোগীর জন্য ইস্যু করতে চান?`)) {
+        const stock = HMS.Storage.getCollection('blood_bank');
+        const item = stock.find(b => b.group === group);
+        if (item && item.units_available > 0) {
+          item.units_available -= 1;
+          HMS.Storage.save();
+          HMS.UI.showToast(`১ ব্যাগ ${group} রক্ত সফলভাবে ইস্যু করা হয়েছে!`, 'success');
+          renderBloodStock();
+        }
+      }
+    }
+
+    function registerDonor() {
+      const name = prompt('রক্তদাতার নাম:');
+      if (!name) return;
+      const phone = prompt('মোবাইল নম্বর:');
+      if (!phone) return;
+      const group = prompt('রক্তের গ্রুপ (যেমন O+, A+, B+):', 'O+');
+      if (!group) return;
+
+      const tbody = document.getElementById('donors-table-body');
+      const row = tbody.insertRow(0);
+      row.innerHTML = `
+        <td><strong>${name}</strong></td>
+        <td><span class="badge bg-danger">${group}</span></td>
+        <td>${phone}</td>
+        <td>নতুন নিবন্ধিত (এইমাত্র)</td>
+        <td><span class="badge bg-success">উপযুক্ত</span></td>
+        <td class="text-end no-export"><button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="HMS.UI.showToast('এসএমএস পাঠানো হয়েছে!', 'success')">যোগাযোগ করুন</button></td>
+      `;
+      HMS.UI.showToast('নতুন রক্তদাতা সফলভাবে নিবন্ধিত হয়েছে!', 'success');
+    }
+  </script>
+</body>
+</html>

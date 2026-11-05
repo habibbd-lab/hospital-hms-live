@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অন্তঃবিভাগ ও ভর্তি ব্যবস্থাপনা (IPD) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">অন্তঃবিভাগ ও ইনপেশেন্ট ব্যবস্থাপনা (IPD Management)</h4>
+            <p class="text-muted small mb-0">রোগী ভর্তি, শয্যা বরাদ্দ, রাউন্ড নোটস, ওয়ার্ড বদল ও ডিসচার্জ সামারি</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('ipd-table', 'carepoint_ipd_admissions.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openAdmissionModal()">
+              <i class="bi bi-hospital me-1"></i>নতুন রোগী ভর্তি (Admission)
+            </button>
+          </div>
+        </div>
+
+        <!-- Admissions Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-hospital text-primary me-2"></i>ভর্তি রোগীদের তালিকা</h6>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control form-control-sm" id="ipd-search" placeholder="রোগীর নাম বা ভর্তি নং..." oninput="filterAdmissions()">
+            </div>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="ipd-table">
+              <thead>
+                <tr>
+                  <th>ভর্তি নং</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>শয্যা ও ওয়ার্ড</th>
+                  <th>ভর্তির তারিখ</th>
+                  <th>চিকিৎসক</th>
+                  <th>প্রাথমিক ডায়াগনোসিস</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="ipd-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Admission Modal -->
+  <div class="modal fade" id="admissionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy"><i class="bi bi-hospital text-primary me-2"></i>ইনপেশেন্ট রোগী ভর্তি ফরম</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleAdmissionSubmit(event)">
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">রোগী নির্বাচন করুন <span class="text-danger">*</span></label>
+                <select class="form-select" id="adm-patient" required onchange="onPatientSelect()"></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">তত্ত্বাবধায়ক চিকিৎসক <span class="text-danger">*</span></label>
+                <select class="form-select" id="adm-doctor" required></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">খালি বেড বরাদ্দ (Available Bed) <span class="text-danger">*</span></label>
+                <select class="form-select" id="adm-bed" required></select>
+                <small class="text-muted" style="font-size:0.75rem;">শুধুমাত্র খালি থাকা শয্যা প্রদর্শিত হচ্ছে।</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">ভর্তি অগ্রিম জমা (Advance Deposit) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="adm-advance" value="20000" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">ভর্তির কারণ / রোগ নির্ণয় (Admission Diagnosis) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="adm-diagnosis" placeholder="উদাঃ Acute Myocardial Infarction, Dengue Hemorrhagic" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-hms-primary">ভর্তি সম্পন্ন করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discharge Summary Modal -->
+  <div class="modal fade" id="dischargeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy"><i class="bi bi-file-earmark-check text-success me-2"></i>ছাড়পত্র ও ডিসচার্জ সামারি</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleDischargeSubmit(event)">
+          <div class="modal-body p-4">
+            <input type="hidden" id="dis-adm-id">
+            <div class="alert alert-info small mb-3">
+              ছাড়পত্র নিশ্চিত করলে রোগীর জন্য বরাদ্দকৃত বেডটি স্বয়ংক্রিয়ভাবে খালি (Available) হিসেবে চিহ্নিত হবে।
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">রোগীর অবস্থা ও শারীরিক উন্নতি (Condition on Discharge)</label>
+              <select class="form-select" id="dis-condition">
+                <option value="Stable / Recovered">স্থিতিশীল ও আরোগ্যপ্রাপ্ত (Stable / Recovered)</option>
+                <option value="Improved">উন্নতিশীল (Improved)</option>
+                <option value="Referred to Specialized Unit">অন্যত্র স্থানান্তরিত (Referred)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">ছাড়পত্র বিবরণী ও চিকিৎসকের উপদেশ (Discharge Summary)</label>
+              <textarea class="form-control" id="dis-summary" rows="4" required>রোগীর শারীরিক অবস্থা সন্তোষজনক। নির্ধারিত ঔষুধ চালিয়ে যাবেন। কোনো জটিলতা দেখা দিলে জরুরি বিভাগে যোগাযোগ করবেন। ৭ দিন পর আউটডোরে ফলোআপ।</textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-success">ছাড়পত্র নিশ্চিত করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let admissionsList = [];
+    let admModalInstance = null;
+    let disModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('ipd');
+      HMS.UI.renderAdminTopbar('অন্তঃবিভাগ (IPD)', [{ title: 'রোগী সেবা', url: '#' }, { title: 'ইনপেশেন্ট ভর্তি', url: '#' }]);
+      loadAdmissions();
+    });
+
+    function loadAdmissions() {
+      admissionsList = HMS.Storage.getCollection('admissions');
+      filterAdmissions();
+    }
+
+    function filterAdmissions() {
+      const q = document.getElementById('ipd-search').value.toLowerCase().trim();
+      const filtered = admissionsList.filter(adm => 
+        !q || adm.patient_name.toLowerCase().includes(q) || adm.admission_no.toLowerCase().includes(q) || adm.uhid.toLowerCase().includes(q)
+      );
+      renderAdmissionsTable(filtered);
+    }
+
+    function renderAdmissionsTable(list) {
+      const tbody = document.getElementById('ipd-table-body');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">কোনো ভর্তি রেকর্ড পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(adm => `
+        <tr>
+          <td><span class="badge bg-secondary">${adm.admission_no}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${adm.patient_name}</div>
+            <small class="text-primary">${adm.uhid}</small>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border">${adm.bed_number}</span>
+            <small class="d-block text-muted">${adm.ward_name}</small>
+          </td>
+          <td><small>${adm.admission_date}</small></td>
+          <td><small class="fw-semibold">${adm.attending_doctor}</small></td>
+          <td><small class="text-muted">${adm.admission_diagnosis}</small></td>
+          <td>
+            <span class="hms-badge ${adm.status === 'Admitted' ? 'badge-cancelled' : 'badge-active'}">
+              <span class="hms-badge-dot"></span>${adm.status}
+            </span>
+          </td>
+          <td class="text-end no-export">
+            <div class="btn-group btn-group-sm">
+              ${adm.status === 'Admitted' ? `
+                <button class="btn btn-outline-success" onclick="openDischargeModal('${adm.id}')" title="ছাড়পত্র দিন">
+                  <i class="bi bi-box-arrow-right"></i> ছাড়পত্র
+                </button>
+              ` : `
+                <button class="btn btn-outline-secondary" onclick="printDischargeSummary('${adm.id}')" title="ডিসচার্জ সামারি প্রিন্ট">
+                  <i class="bi bi-printer"></i>
+                </button>
+              `}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAdmissionModal() {
+      const patients = HMS.Storage.getCollection('patients').filter(p => p.status !== 'Admitted');
+      const docs = HMS.Storage.getCollection('doctors');
+      const availableBeds = HMS.Storage.getCollection('beds').filter(b => b.status === 'Available');
+
+      const patSelect = document.getElementById('adm-patient');
+      patSelect.innerHTML = '<option value="">রোগী বাছাই করুন...</option>' + 
+        patients.map(p => `<option value="${p.uhid}" data-name="${p.name_bn}">${p.name_bn} (${p.uhid})</option>`).join('');
+
+      const docSelect = document.getElementById('adm-doctor');
+      docSelect.innerHTML = docs.map(d => `<option value="${d.name_bn}">${d.name_bn} (${d.dept_name})</option>`).join('');
+
+      const bedSelect = document.getElementById('adm-bed');
+      if (availableBeds.length === 0) {
+        bedSelect.innerHTML = '<option value="">বর্তমানে কোনো শয্যা খালি নেই</option>';
+      } else {
+        bedSelect.innerHTML = availableBeds.map(b => `<option value="${b.id}">${b.ward_name} - বেড ${b.number} (${HMS.I18n.formatCurrency(b.charge)}/দিন)</option>`).join('');
+      }
+
+      admModalInstance = new bootstrap.Modal(document.getElementById('admissionModal'));
+      admModalInstance.show();
+    }
+
+    function onPatientSelect() {}
+
+    function handleAdmissionSubmit(e) {
+      e.preventDefault();
+      const patSelect = document.getElementById('adm-patient');
+      const uhid = patSelect.value;
+      const patientName = patSelect.options[patSelect.selectedIndex].getAttribute('data-name');
+      const bedId = document.getElementById('adm-bed').value;
+      const doctor = document.getElementById('adm-doctor').value;
+      const diagnosis = document.getElementById('adm-diagnosis').value;
+      const advance = Number(document.getElementById('adm-advance').value) || 20000;
+
+      if (!bedId) {
+        alert('খালি শয্যা নির্বাচন করুন।');
+        return;
+      }
+
+      try {
+        HMS.Storage.admitPatient({
+          uhid: uhid,
+          patient_name: patientName,
+          bed_id: bedId,
+          attending_doctor: doctor,
+          admission_diagnosis: diagnosis,
+          advance_paid: advance
+        });
+
+        admModalInstance.hide();
+        HMS.UI.showToast('রোগী সফলভাবে অন্তঃবিভাগে ভর্তি ও শয্যা বরাদ্দ সম্পন্ন হয়েছে!', 'success');
+        loadAdmissions();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function openDischargeModal(admId) {
+      document.getElementById('dis-adm-id').value = admId;
+      disModalInstance = new bootstrap.Modal(document.getElementById('dischargeModal'));
+      disModalInstance.show();
+    }
+
+    function handleDischargeSubmit(e) {
+      e.preventDefault();
+      const admId = document.getElementById('dis-adm-id').value;
+      const summary = document.getElementById('dis-summary').value;
+
+      HMS.Storage.dischargePatient(admId, { summary: summary });
+      disModalInstance.hide();
+      HMS.UI.showToast('রোগীর ছাড়পত্র সম্পন্ন হয়েছে এবং শয্যা খালি করা হয়েছে!', 'success');
+      loadAdmissions();
+    }
+
+    function printDischargeSummary(admId) {
+      const adm = HMS.Storage.getById('admissions', admId);
+      if (!adm) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Discharge Summary - ${adm.admission_no}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            .header { text-align: center; border-bottom: 2px solid #12304A; padding-bottom: 15px; margin-bottom: 25px; }
+            .title { font-size: 22px; color: #12304A; font-weight: bold; }
+            .box { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+            .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+          </style>
+        </head>
+        <body onload="window.print()">
+          <div class="header">
+            <div class="title">CarePoint Multispecialty Hospital</div>
+            <div>Plot 18, Road 7, Dhanmondi, Dhaka | Hotline: 10678</div>
+            <h3>INPATIENT DISCHARGE SUMMARY</h3>
+          </div>
+          <div class="box">
+            <div class="row"><span>Patient Name: <strong>${adm.patient_name}</strong></span><span>UHID: <strong>${adm.uhid}</strong></span></div>
+            <div class="row"><span>Admission No: <strong>${adm.admission_no}</strong></span><span>Ward/Bed: <strong>${adm.ward_name} / Bed ${adm.bed_number}</strong></span></div>
+            <div class="row"><span>Admission Date: <strong>${adm.admission_date}</strong></span><span>Discharge Date: <strong>${adm.discharge_date || 'N/A'}</strong></span></div>
+            <div class="row"><span>Attending Consultant: <strong>${adm.attending_doctor}</strong></span><span>Diagnosis: <strong>${adm.admission_diagnosis}</strong></span></div>
+          </div>
+          <h4>Clinical Summary & Discharge Advice:</h4>
+          <p style="line-height:1.6; border:1px solid #ddd; padding:15px; border-radius:6px;">
+            ${adm.discharge_summary || 'রোগীর শারীরিক অবস্থা স্থিতিশীল বিবেচনায় ছাড়পত্র প্রদান করা হলো।'}
+          </p>
+          <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+            <div>________________________<br>Resident Medical Officer</div>
+            <div>________________________<br>Authorized Specialist Sign</div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

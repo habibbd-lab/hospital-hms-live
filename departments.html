@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিভাগসমূহ (Departments) | কেয়ারপয়েন্ট হাসপাতাল</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+  <div id="public-topbar-placeholder"></div>
+  <div id="public-navbar-placeholder"></div>
+
+  <div class="bg-hms-navy text-white py-5">
+    <div class="container text-center">
+      <h1 class="fw-bold mb-2">আমাদের বিশেষায়িত ক্লিনিকাল বিভাগসমূহ</h1>
+      <p class="text-light opacity-75 mb-0">সর্বাধুনিক যন্ত্রপাতি ও অভিজ্ঞ বিশেষজ্ঞদের সমন্বয়ে বিশেষায়িত সেবা</p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <!-- Filter and Search -->
+    <div class="row justify-content-between align-items-center mb-4 g-3">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" class="form-control" id="dept-search" placeholder="বিভাগের নাম দিয়ে খুঁজুন..." oninput="filterDepartments()">
+        </div>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <span class="text-muted small">মোট বিভাগ: <strong id="dept-total-count" class="text-hms-navy">১২</strong> টি</span>
+      </div>
+    </div>
+
+    <!-- Departments Grid -->
+    <div class="row g-4" id="departments-container">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <div id="public-footer-placeholder"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/website.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.Website.initNavbarAndFooter('departments');
+      renderDepartments();
+    });
+
+    let allDepts = [];
+
+    function renderDepartments(filtered = null) {
+      allDepts = HMS.Storage.getCollection('departments');
+      const list = filtered || allDepts;
+      document.getElementById('dept-total-count').textContent = list.length;
+      const container = document.getElementById('departments-container');
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="col-12">
+            <div class="hms-empty-state">
+              <i class="bi bi-search hms-empty-state-icon"></i>
+              <h5 class="hms-empty-state-title">কোনো বিভাগ খুঁজে পাওয়া যায়নি</h5>
+              <p class="hms-empty-state-desc">অন্য কোনো শব্দ দিয়ে অনুসন্ধান করার চেষ্টা করুন।</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(d => `
+        <div class="col-xl-3 col-lg-4 col-md-6">
+          <div class="department-card">
+            <div class="department-icon">
+              <i class="bi ${d.icon}"></i>
+            </div>
+            <h5 class="department-title">${d.name_bn}</h5>
+            <div class="text-primary fw-semibold small mb-2">${d.name_en}</div>
+            <p class="department-desc">বিভাগীয় প্রধান: ${d.head || 'সিনিয়র কনসালট্যান্ট'}<br>ফ্লোর: <strong>${d.floor}</strong></p>
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+              <span class="badge bg-light text-success border"><i class="bi bi-people me-1"></i>${d.doctors_count || 4} চিকিৎসক</span>
+              <a href="doctors.html?dept=${d.id}" class="btn btn-sm btn-outline-primary">ডাক্তার তালিকা</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterDepartments() {
+      const q = document.getElementById('dept-search').value.toLowerCase().trim();
+      const filtered = allDepts.filter(d => 
+        d.name_bn.toLowerCase().includes(q) || 
+        d.name_en.toLowerCase().includes(q) || 
+        (d.head && d.head.toLowerCase().includes(q))
+      );
+      renderDepartments(filtered);
+    }
+  </script>
+</body>
+</html>

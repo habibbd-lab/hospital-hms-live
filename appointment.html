@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ডাক্তার অ্যাপয়েন্টমেন্ট বুকিং | কেয়ারপয়েন্ট হাসপাতাল</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+  <div id="public-topbar-placeholder"></div>
+  <div id="public-navbar-placeholder"></div>
+
+  <div class="bg-hms-navy text-white py-4 no-print">
+    <div class="container text-center">
+      <h2 class="fw-bold mb-1">অনলাইন ডাক্তার অ্যাপয়েন্টমেন্ট বুকিং</h2>
+      <p class="text-light opacity-75 mb-0">সহজ ৩টি ধাপে আপনার পছন্দমতো বিশেষজ্ঞ চিকিৎসকের সিরিয়াল গ্রহণ করুন</p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <!-- Booking Form Card (Hidden when confirmation slip is shown) -->
+    <div class="row justify-content-center" id="booking-form-section">
+      <div class="col-lg-9">
+        <div class="hms-card p-4 p-md-5">
+          <form id="appointment-form" onsubmit="handleAppointmentSubmit(event)">
+            <h4 class="fw-bold text-hms-navy mb-4 border-bottom pb-2">
+              <i class="bi bi-calendar-check text-primary me-2"></i>১. চিকিৎসক ও সময় নির্বাচন
+            </h4>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">বিভাগ (Department) <span class="text-danger">*</span></label>
+                <select class="form-select" id="apt-dept" required onchange="onDeptChange()">
+                  <option value="">বিভাগ নির্বাচন করুন...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">বিশেষজ্ঞ চিকিৎসক (Doctor) <span class="text-danger">*</span></label>
+                <select class="form-select" id="apt-doctor" required onchange="onDoctorChange()">
+                  <option value="">প্রথমে বিভাগ পছন্দ করুন...</option>
+                </select>
+              </div>
+              <div class="col-12" id="doctor-info-box" style="display:none;">
+                <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <h6 class="mb-0 fw-bold text-primary" id="box-doc-name"></h6>
+                    <small class="text-muted" id="box-doc-degrees"></small>
+                  </div>
+                  <div>
+                    <span class="badge bg-success me-2" id="box-doc-schedule"></span>
+                    <strong class="text-hms-navy" id="box-doc-fee"></strong>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">অ্যাপয়েন্টমেন্টের তারিখ <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="apt-date" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">সময় স্লট (Time Slot) <span class="text-danger">*</span></label>
+                <select class="form-select" id="apt-slot" required>
+                  <option value="05:30 PM">বিকাল ৫:৩০ (Token 1-5)</option>
+                  <option value="06:30 PM">সন্ধ্যা ৬:৩০ (Token 6-10)</option>
+                  <option value="07:30 PM">রাত ৭:৩০ (Token 11-15)</option>
+                  <option value="08:30 PM">রাত ৮:৩০ (Token 16-20)</option>
+                </select>
+              </div>
+            </div>
+
+            <h4 class="fw-bold text-hms-navy mb-4 border-bottom pb-2">
+              <i class="bi bi-person text-success me-2"></i>২. রোগীর তথ্য
+            </h4>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">রোগীর পূর্ণ নাম <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="apt-patient-name" placeholder="রোগীর নাম লিখুন" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="apt-patient-phone" placeholder="017xxxxxxxx" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">বয়স</label>
+                <input type="number" class="form-control" id="apt-patient-age" placeholder="বয়স (বছর)" value="45">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">লিঙ্গ</label>
+                <select class="form-select" id="apt-patient-gender">
+                  <option value="Male">পুরুষ (Male)</option>
+                  <option value="Female">নারী (Female)</option>
+                  <option value="Other">অন্যান্য</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">রক্তের গ্রুপ</label>
+                <select class="form-select" id="apt-patient-blood">
+                  <option value="B+">B Positive (B+)</option>
+                  <option value="A+">A Positive (A+)</option>
+                  <option value="O+">O Positive (O+)</option>
+                  <option value="AB+">AB Positive (AB+)</option>
+                  <option value="O-">O Negative (O-)</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">প্রধান সমস্যা / শারীরিক লক্ষণ (Symptoms)</label>
+                <textarea class="form-control" id="apt-symptoms" rows="2" placeholder="সমস্যা সংক্ষেপে লিখুন (ঐচ্ছিক)"></textarea>
+              </div>
+            </div>
+
+            <h4 class="fw-bold text-hms-navy mb-4 border-bottom pb-2">
+              <i class="bi bi-credit-card text-warning me-2"></i>৩. পেমেন্ট মোড (ডেমো)
+            </h4>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <div class="form-check p-3 border rounded-3 bg-light">
+                  <input class="form-check-input" type="radio" name="pay_mode" id="pay1" value="Hospital Counter" checked>
+                  <label class="form-check-label fw-semibold" for="pay1">
+                    হাসপাতাল কাউন্টারে ক্যাশ
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check p-3 border rounded-3 bg-light">
+                  <input class="form-check-input" type="radio" name="pay_mode" id="pay2" value="bKash Online">
+                  <label class="form-check-label fw-semibold" for="pay2">
+                    বিকাশ (bKash Demo)
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check p-3 border rounded-3 bg-light">
+                  <input class="form-check-input" type="radio" name="pay_mode" id="pay3" value="Debit/Credit Card">
+                  <label class="form-check-label fw-semibold" for="pay3">
+                    কার্ড পেমেন্ট (Card Demo)
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-hms-primary btn-lg w-100">
+              <i class="bi bi-check-circle me-1"></i>অ্যাপয়েন্টমেন্ট বুকিং নিশ্চিত করুন
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Confirmation Slip (Displayed after submission) -->
+    <div class="row justify-content-center" id="confirmation-slip-section" style="display:none;">
+      <div class="col-lg-8">
+        <div class="hms-card p-4 p-md-5 border-success border-2 shadow-lg">
+          <div class="text-center mb-4 pb-3 border-bottom">
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-2 d-block"></i>
+            <h3 class="fw-bold text-hms-navy mb-1">অ্যাপয়েন্টমেন্ট বুকিং সফল হয়েছে!</h3>
+            <p class="text-muted small mb-0">কেয়ারপয়েন্ট হাসপাতাল ও গবেষণা কেন্দ্র | বহির্বিভাগ (OPD)</p>
+          </div>
+
+          <div class="p-3 bg-light rounded-3 mb-4 text-center">
+            <span class="text-muted small text-uppercase">আপনার সিরিয়াল টোকেন নম্বর</span>
+            <div class="display-5 fw-bold text-primary my-1" id="slip-token"></div>
+            <div class="fw-semibold text-hms-navy" id="slip-apt-no"></div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="text-muted small">রোগীর নাম:</label>
+              <div class="fw-bold" id="slip-patient-name"></div>
+            </div>
+            <div class="col-6">
+              <label class="text-muted small">মোবাইল:</label>
+              <div class="fw-bold" id="slip-patient-phone"></div>
+            </div>
+            <div class="col-6">
+              <label class="text-muted small">চিকিৎসক:</label>
+              <div class="fw-bold text-primary" id="slip-doctor-name"></div>
+            </div>
+            <div class="col-6">
+              <label class="text-muted small">বিভাগ ও রুম:</label>
+              <div class="fw-bold" id="slip-dept-room"></div>
+            </div>
+            <div class="col-6">
+              <label class="text-muted small">তারিখ ও সময়:</label>
+              <div class="fw-bold" id="slip-datetime"></div>
+            </div>
+            <div class="col-6">
+              <label class="text-muted small">পরামর্শ ফি:</label>
+              <div class="fw-bold text-success fs-5" id="slip-fee"></div>
+            </div>
+          </div>
+
+          <div class="alert alert-info small mb-4">
+            <i class="bi bi-info-circle-fill me-1"></i>অনুগ্রহ করে নির্ধারিত সময়ের ১৫ মিনিট পূর্বে হাসপাতালের বহির্বিভাগ (OPD) রিসেপশনে উপস্থিত হয়ে টোকেন প্রদর্শন করুন।
+          </div>
+
+          <div class="d-flex justify-content-between gap-2 flex-wrap no-print">
+            <button class="btn btn-outline-secondary" onclick="window.print()">
+              <i class="bi bi-printer me-1"></i>স্লিপ প্রিন্ট করুন
+            </button>
+            <a href="patient/appointments.html" class="btn btn-hms-success">
+              <i class="bi bi-person me-1"></i>পেশেন্ট পোর্টালে দেখুন
+            </a>
+            <button class="btn btn-hms-primary" onclick="bookAnotherAppointment()">
+              নতুন আরেকটি সিরিয়াল নিন
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="public-footer-placeholder"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/website.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    let doctorsList = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.Website.initNavbarAndFooter('appointment');
+      initAppointmentForm();
+    });
+
+    function initAppointmentForm() {
+      doctorsList = HMS.Storage.getCollection('doctors');
+      const depts = HMS.Storage.getCollection('departments');
+      const deptSelect = document.getElementById('apt-dept');
+      deptSelect.innerHTML = '<option value="">বিভাগ নির্বাচন করুন...</option>' + 
+        depts.map(d => `<option value="${d.id}">${d.name_bn}</option>`).join('');
+
+      const todayDate = new Date().toISOString().slice(0, 10);
+      const dateEl = document.getElementById('apt-date');
+      dateEl.min = todayDate;
+      dateEl.value = todayDate;
+
+      // Handle query parameters if coming from another page
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlDocId = urlParams.get('doc');
+      const urlDeptId = urlParams.get('dept');
+      const urlPhone = urlParams.get('phone');
+
+      if (urlDeptId) {
+        deptSelect.value = urlDeptId;
+        onDeptChange();
+      }
+      if (urlDocId) {
+        const found = doctorsList.find(d => d.id === urlDocId);
+        if (found) {
+          deptSelect.value = found.dept_id;
+          onDeptChange();
+          document.getElementById('apt-doctor').value = urlDocId;
+          onDoctorChange();
+        }
+      }
+      if (urlPhone) {
+        document.getElementById('apt-patient-phone').value = urlPhone;
+      }
+    }
+
+    function onDeptChange() {
+      const deptId = document.getElementById('apt-dept').value;
+      const docSelect = document.getElementById('apt-doctor');
+      const filtered = doctorsList.filter(d => !deptId || d.dept_id === deptId);
+
+      docSelect.innerHTML = '<option value="">চিকিৎসক নির্বাচন করুন...</option>' + 
+        filtered.map(d => `<option value="${d.id}">${d.name_bn} (${d.designation})</option>`).join('');
+
+      document.getElementById('doctor-info-box').style.display = 'none';
+    }
+
+    function onDoctorChange() {
+      const docId = document.getElementById('apt-doctor').value;
+      const doc = doctorsList.find(d => d.id === docId);
+      const infoBox = document.getElementById('doctor-info-box');
+
+      if (doc) {
+        infoBox.style.display = 'block';
+        document.getElementById('box-doc-name').textContent = doc.name_bn;
+        document.getElementById('box-doc-degrees').textContent = `${doc.degrees} | রুম নং: ${doc.room}`;
+        document.getElementById('box-doc-schedule').textContent = doc.schedule;
+        document.getElementById('box-doc-fee').textContent = `পরামর্শ ফি: ${HMS.I18n.formatCurrency(doc.fee)}`;
+      } else {
+        infoBox.style.display = 'none';
+      }
+    }
+
+    function handleAppointmentSubmit(e) {
+      e.preventDefault();
+      const docId = document.getElementById('apt-doctor').value;
+      const doc = doctorsList.find(d => d.id === docId);
+      if (!doc) {
+        alert('অনুগ্রহ করে একজন চিকিৎসক নির্বাচন করুন।');
+        return;
+      }
+
+      const pName = document.getElementById('apt-patient-name').value;
+      const pPhone = document.getElementById('apt-patient-phone').value;
+      const date = document.getElementById('apt-date').value;
+      const slot = document.getElementById('apt-slot').value;
+      const symptoms = document.getElementById('apt-symptoms').value;
+      const payMode = document.querySelector('input[name="pay_mode"]:checked').value;
+
+      // Book via central Storage Engine
+      const newApt = HMS.Storage.bookAppointment({
+        patient_uhid: 'CPH-2026-0001', // Attached to default demo patient or created
+        patient_name: pName,
+        patient_phone: pPhone,
+        doctor_id: doc.id,
+        doctor_name: doc.name_bn,
+        dept_name: doc.dept_name,
+        date: date,
+        time_slot: slot,
+        fee: doc.fee,
+        type: 'Online Booking',
+        symptoms: symptoms,
+        payment_method: payMode
+      });
+
+      // Show confirmation slip
+      document.getElementById('booking-form-section').style.display = 'none';
+      const slipSec = document.getElementById('confirmation-slip-section');
+      slipSec.style.display = 'flex';
+
+      document.getElementById('slip-token').textContent = `TOKEN #${newApt.token_no}`;
+      document.getElementById('slip-apt-no').textContent = `Appointment Ref: ${newApt.appointment_no}`;
+      document.getElementById('slip-patient-name').textContent = pName;
+      document.getElementById('slip-patient-phone').textContent = pPhone;
+      document.getElementById('slip-doctor-name').textContent = doc.name_bn;
+      document.getElementById('slip-dept-room').textContent = `${doc.dept_name} (রুম: ${doc.room})`;
+      document.getElementById('slip-datetime').textContent = `${date} at ${slot}`;
+      document.getElementById('slip-fee').textContent = HMS.I18n.formatCurrency(doc.fee);
+
+      HMS.UI.showToast('অ্যাপয়েন্টমেন্ট সফলভাবে কনফার্ম হয়েছে!', 'success');
+    }
+
+    function bookAnotherAppointment() {
+      document.getElementById('appointment-form').reset();
+      document.getElementById('confirmation-slip-section').style.display = 'none';
+      document.getElementById('booking-form-section').style.display = 'flex';
+      initAppointmentForm();
+    }
+  </script>
+</body>
+</html>

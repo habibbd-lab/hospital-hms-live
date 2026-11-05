@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>রোগী নিবন্ধন (Patient Registration) | কেয়ারপয়েন্ট হাসপাতাল</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body class="bg-light">
+
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="container py-5">
+    <div class="text-center mb-4">
+      <a href="index.html" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-2">
+        <div class="brand-logo-icon">
+          <i class="bi bi-hospital"></i>
+        </div>
+        <h3 class="fw-bold text-hms-navy mb-0">CarePoint Hospital</h3>
+      </a>
+      <p class="text-muted small">ডিজিটাল রোগী নিবন্ধন ও অনন্য স্বাস্থ্য পরিচয়পত্র (UHID) তৈরি</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="hms-card p-4 p-md-5">
+          <form id="patient-reg-form" onsubmit="handlePatientRegistration(event)">
+            <h5 class="fw-bold text-hms-navy mb-3 pb-2 border-bottom">
+              <i class="bi bi-person-plus text-primary me-2"></i>রোগীর ব্যক্তিগত তথ্য
+            </h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">রোগীর পূর্ণ নাম (বাংলায়) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-name-bn" placeholder="উদাঃ মো. রফিকুল ইসলাম" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">রোগীর নাম (ইংরেজিতে) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="reg-name-en" placeholder="e.g. Md. Rafiqul Islam" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="reg-phone" placeholder="017xxxxxxxx" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">জন্ম তারিখ <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="reg-dob" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">বয়স</label>
+                <input type="number" class="form-control" id="reg-age" placeholder="বয়স (বছর)" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">লিঙ্গ <span class="text-danger">*</span></label>
+                <select class="form-select" id="reg-gender" required>
+                  <option value="Male">পুরুষ (Male)</option>
+                  <option value="Female">নারী (Female)</option>
+                  <option value="Other">অন্যান্য</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">রক্তের গ্রুপ <span class="text-danger">*</span></label>
+                <select class="form-select" id="reg-blood" required>
+                  <option value="A+">A Positive (A+)</option>
+                  <option value="A-">A Negative (A-)</option>
+                  <option value="B+">B Positive (B+)</option>
+                  <option value="B-">B Negative (B-)</option>
+                  <option value="O+" selected>O Positive (O+)</option>
+                  <option value="O-">O Negative (O-)</option>
+                  <option value="AB+">AB Positive (AB+)</option>
+                  <option value="AB-">AB Negative (AB-)</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">জাতীয় পরিচয়পত্র / জন্মনিবন্ধন নং</label>
+                <input type="text" class="form-control" id="reg-nid" placeholder="NID বা জন্মসনদ নম্বর">
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">বর্তমান ঠিকানা <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="reg-address" rows="2" placeholder="বাড়ি, রোড, এলাকা, জেলা" required></textarea>
+              </div>
+            </div>
+
+            <h5 class="fw-bold text-hms-navy mb-3 pb-2 border-bottom">
+              <i class="bi bi-shield-plus text-danger me-2"></i>জরুরি যোগাযোগ ও প্রাথমিক স্বাস্থ্য তথ্য
+            </h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">জরুরি যোগাযোগের ব্যক্তির নাম ও সম্পর্ক</label>
+                <input type="text" class="form-control" id="reg-emerg-name" placeholder="উদাঃ সুলতানা ইসলাম (স্ত্রী)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">জরুরি যোগাযোগ নম্বর</label>
+                <input type="tel" class="form-control" id="reg-emerg-phone" placeholder="018xxxxxxxx">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">জানা কোনো এলার্জি (Allergies)</label>
+                <input type="text" class="form-control" id="reg-allergies" placeholder="উদাঃ পেনিসিলিন, ধুলাবালি বা খাদ্য এলার্জি">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">দীর্ঘমেয়াদী রোগ (Chronic Illnesses)</label>
+                <input type="text" class="form-control" id="reg-chronic" placeholder="উদাঃ ডায়াবেটিস, উচ্চ রক্তচাপ, অ্যাজমা">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-hms-primary btn-lg w-100 mb-3">
+              <i class="bi bi-check-circle me-1"></i>নিবন্ধন সম্পন্ন করুন ও UHID কার্ড পান
+            </button>
+            <div class="text-center small text-muted">
+              পূর্বে নিবন্ধিত আছেন? <a href="login.html" class="text-primary fw-semibold">লগইন করুন</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    function handlePatientRegistration(e) {
+      e.preventDefault();
+      const pData = {
+        name_bn: document.getElementById('reg-name-bn').value,
+        name_en: document.getElementById('reg-name-en').value,
+        phone: document.getElementById('reg-phone').value,
+        dob: document.getElementById('reg-dob').value,
+        age: Number(document.getElementById('reg-age').value) || 30,
+        gender: document.getElementById('reg-gender').value,
+        blood_group: document.getElementById('reg-blood').value,
+        nid: document.getElementById('reg-nid').value,
+        address: document.getElementById('reg-address').value,
+        emergency_contact_name: document.getElementById('reg-emerg-name').value,
+        emergency_contact_phone: document.getElementById('reg-emerg-phone').value,
+        allergies: document.getElementById('reg-allergies').value || 'None known',
+        chronic_conditions: document.getElementById('reg-chronic').value || 'None'
+      };
+
+      const newPatient = HMS.Storage.registerPatient(pData);
+      HMS.Auth.loginAs('patient');
+      HMS.UI.showToast(`নিবন্ধন সফল! আপনার ইউনিক UHID: ${newPatient.uhid}`, 'success');
+      setTimeout(() => {
+        window.location.href = 'patient/index.html';
+      }, 800);
+    }
+  </script>
+</body>
+</html>

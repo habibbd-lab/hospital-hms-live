@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>রেডিওলজি ও ডিজিটাল ইমেজিং | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">রেডিওলজি ও ডিজিটাল ইমেজিং (Radiology & Imaging)</h4>
+            <p class="text-muted small mb-0">ডিজিটাল এক্স-রে, সিটি স্ক্যান, এমআরআই, কালার ডপলার ও পিএসিএস (PACS) ইন্টিগ্রেশন ডেমো</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('rad-table', 'carepoint_radiology.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+          </div>
+        </div>
+
+        <!-- Radiology Orders Table -->
+        <div class="hms-card mb-4">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-camera-reels text-primary me-2"></i>ইমেজিং অর্ডার ও রিপোর্ট প্রস্তুতকরণ</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="rad-table">
+              <thead>
+                <tr>
+                  <th>অর্ডার নং</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>ইমেজিং সার্ভিস</th>
+                  <th>ক্যাটাগরি</th>
+                  <th>তারিখ</th>
+                  <th>চার্জ (৳)</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="rad-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PACS / Simulated DICOM Viewer Card -->
+        <div class="hms-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold text-hms-navy mb-0"><i class="bi bi-display text-success me-2"></i>ডিজিটাল পিএসিএস (PACS / DICOM) ভিউয়ার সিমুলেশন</h5>
+              <small class="text-muted">রেডিওলজিস্ট কনসোল ডায়াগনস্টিক ভিউয়ার (Static Prototype Simulation)</small>
+            </div>
+            <span class="badge bg-info text-dark">Simulated PACS Engine</span>
+          </div>
+          <div class="p-4 bg-dark text-white rounded-3 text-center" style="min-height: 250px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <i class="bi bi-image fs-1 text-secondary mb-2"></i>
+            <h6 class="text-light">ডিজিটাল এক্স-রে ও এমআরআই স্ক্যান ভিউয়ার</h6>
+            <p class="small text-muted mb-0">প্রকৃত সার্ভার বা পিএসিএস রাউটার সংযুক্ত থাকলে এখানে হাই-রেজ্যুলেশন ডাইকম (DICOM) ইমেজ রেন্ডার হবে।</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('radiology');
+      HMS.UI.renderAdminTopbar('রেডিওলজি ও ইমেজিং', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'রেডিওলজি', url: '#' }]);
+      loadRadiology();
+    });
+
+    function loadRadiology() {
+      const orders = HMS.Storage.getCollection('radiology_orders');
+      const tbody = document.getElementById('rad-table-body');
+      tbody.innerHTML = orders.map(r => `
+        <tr>
+          <td><span class="badge bg-secondary">${r.order_no}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${r.patient_name}</div>
+            <small class="text-primary">${r.uhid}</small>
+          </td>
+          <td class="fw-semibold">${r.service_name}</td>
+          <td><span class="badge bg-light text-dark border">${r.category}</span></td>
+          <td><small>${r.date}</small></td>
+          <td><strong>${HMS.I18n.formatCurrency(r.price)}</strong></td>
+          <td>
+            <span class="hms-badge ${r.status === 'Approved' ? 'badge-active' : 'badge-pending'}">
+              <span class="hms-badge-dot"></span>${r.status}
+            </span>
+          </td>
+          <td class="text-end no-export">
+            <button class="btn btn-sm btn-outline-primary" onclick="alert('রেডিওলজি পর্যবেক্ষণ:\\n\\n' + '${r.findings}')">
+              <i class="bi bi-file-text"></i> রিপোর্ট
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

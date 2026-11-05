@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>আমার অ্যাপয়েন্টমেন্টসমূহ | CarePoint Patient Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar patient-sidebar" id="patient-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="patient-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-calendar-check-fill text-primary me-2"></i>আমার অ্যাপয়েন্টমেন্ট ও সিরিয়াল</h4>
+            <p class="text-muted small mb-0">আপনার চিকিৎসকের সিরিয়াল টোকেন, চেম্বার শিডিউল ও স্ট্যাটাস ট্র্যাকিং</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="../appointment.html" class="btn btn-hms-primary btn-sm">
+              <i class="bi bi-calendar-plus me-1"></i>নতুন অ্যাপয়েন্টমেন্ট বুক করুন
+            </a>
+          </div>
+        </div>
+
+        <!-- Appointments Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">অ্যাপয়েন্টমেন্ট ইতিহাস ও বর্তমান সিরিয়াল</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>টোকেন নং</th>
+                  <th>অ্যাপয়েন্টমেন্ট আইডি</th>
+                  <th>চিকিৎসক</th>
+                  <th>বিভাগ</th>
+                  <th>তারিখ ও সময়</th>
+                  <th>পরামর্শ ফি</th>
+                  <th>পেমেন্ট</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="my-apts-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderPatientSidebar('appointments');
+      HMS.UI.renderPatientTopbar('আমার অ্যাপয়েন্টমেন্ট');
+      loadMyAppointments();
+    });
+
+    function loadMyAppointments() {
+      const uhid = 'CPH-2026-0001';
+      const apts = HMS.Storage.getCollection('appointments').filter(a => a.patient_uhid === uhid);
+      const tbody = document.getElementById('my-apts-table-body');
+
+      if (apts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-5 text-muted">কোনো অ্যাপয়েন্টমেন্ট পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = apts.map(a => `
+        <tr>
+          <td><span class="badge bg-primary fs-6">#${a.token_no}</span></td>
+          <td><small class="fw-bold">${a.appointment_no}</small></td>
+          <td><strong>${a.doctor_name}</strong></td>
+          <td><span class="badge bg-light text-primary border">${a.dept_name}</span></td>
+          <td><div>${a.date}</div><small class="text-muted">${a.time_slot}</small></td>
+          <td><strong>${HMS.I18n.formatCurrency(a.fee)}</strong></td>
+          <td><span class="badge bg-success-subtle text-success">${a.payment_status || 'Paid'}</span></td>
+          <td>
+            <span class="hms-badge ${a.status === 'Completed' ? 'badge-active' : 'badge-pending'}">
+              <span class="hms-badge-dot"></span>${a.status}
+            </span>
+          </td>
+          <td class="text-end no-export">
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="printTokenSlip('${a.id}')" title="টোকেন প্রিন্ট">
+              <i class="bi bi-printer"></i>
+            </button>
+            ${a.status !== 'Completed' && a.status !== 'Cancelled' ? `
+              <button class="btn btn-sm btn-outline-danger py-0 px-2" onclick="cancelMyAppoint('${a.id}')" title="বাতিল করুন">
+                বাতিল
+              </button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function cancelMyAppoint(id) {
+      if (confirm('আপনি কি এই অ্যাপয়েন্টমেন্ট বাতিল করতে চান?')) {
+        HMS.Storage.update('appointments', id, { status: 'Cancelled' });
+        HMS.UI.showToast('অ্যাপয়েন্টমেন্ট সফলভাবে বাতিল করা হয়েছে!', 'info');
+        loadMyAppointments();
+      }
+    }
+
+    function printTokenSlip(id) {
+      const a = HMS.Storage.getById('appointments', id);
+      if (!a) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Appointment Token #${a.token_no}</title>
+          <style>body{font-family:sans-serif; text-align:center; padding:30px;}</style>
+        </head>
+        <body onload="window.print()">
+          <h2>CarePoint Multispecialty Hospital</h2>
+          <h3>APPOINTMENT SERIAL TOKEN</h3>
+          <div style="font-size:36px; color:#1677C8; font-weight:bold; margin:20px 0;">TOKEN #${a.token_no}</div>
+          <p><strong>Patient:</strong> ${a.patient_name} (${a.patient_uhid})</p>
+          <p><strong>Doctor:</strong> ${a.doctor_name} (${a.dept_name})</p>
+          <p><strong>Date & Time:</strong> ${a.date} at ${a.time_slot}</p>
+          <p><strong>Fee:</strong> ৳${a.fee} (Paid)</p>
+          <small>Please arrive 15 minutes before chamber time. Helpline: 10678</small>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

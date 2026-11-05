@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ল্যাবরেটরি ইনফরমেশন সিস্টেম (LIS) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">ল্যাবরেটরি ম্যানেজমেন্ট (Laboratory Information System - LIS)</h4>
+            <p class="text-muted small mb-0">স্যাম্পল কালেকশন, বারকোড ট্র্যাকিং, ফলাফল এন্ট্রি ও অনুমোদিত রিপোর্ট</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('lab-orders-table', 'carepoint_lab_orders.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewLabOrderModal()">
+              <i class="bi bi-plus-circle me-1"></i>নতুন ল্যাব অর্ডার
+            </button>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="hms-card mb-4">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-eyedropper text-primary me-2"></i>ল্যাব টেস্ট অর্ডার ও ট্র্যাকিং কিউ</h6>
+            <div class="d-flex gap-2">
+              <select class="form-select form-select-sm" id="lab-status-filter" onchange="filterLabOrders()">
+                <option value="">সকল স্ট্যাটাস</option>
+                <option value="Ordered">Ordered</option>
+                <option value="Sample Collected">Sample Collected</option>
+                <option value="Processing">Processing</option>
+                <option value="Approved">Approved</option>
+              </select>
+            </div>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="lab-orders-table">
+              <thead>
+                <tr>
+                  <th>অর্ডার আইডি</th>
+                  <th>স্যাম্পল আইডি / বারকোড</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>পরীক্ষাসমূহ (Tests)</th>
+                  <th>তারিখ ও রেফারেন্স</th>
+                  <th>বিলিং</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="lab-orders-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Test Catalog Section -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-journal-medical text-success me-2"></i>প্যাথলজি টেস্ট ক্যাটালগ ও মূল্যতালিকা</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>কোড</th>
+                  <th>পরীক্ষার নাম</th>
+                  <th>ক্যাটাগরি</th>
+                  <th>স্ট্যান্ডার্ড নরমাল রেঞ্জ</th>
+                  <th>রিপোর্ট সময়</th>
+                  <th>ফি (৳)</th>
+                </tr>
+              </thead>
+              <tbody id="lab-catalog-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Result Entry Modal -->
+  <div class="modal fade" id="resultEntryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy"><i class="bi bi-clipboard-data text-primary me-2"></i>ল্যাবরেটরি টেস্ট রেজাল্ট এন্ট্রি</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleResultSubmit(event)">
+          <div class="modal-body p-4">
+            <input type="hidden" id="res-order-id">
+            <div class="p-3 bg-light rounded-3 mb-3 d-flex justify-content-between align-items-center">
+              <div>
+                <strong id="res-patient-name" class="text-hms-navy"></strong>
+                <small class="d-block text-muted" id="res-tests-list"></small>
+              </div>
+              <span class="badge bg-secondary font-monospace" id="res-sample-id"></span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>প্যারামিটার</th>
+                    <th style="width:140px;">ফলাফল (Value)</th>
+                    <th>একক (Unit)</th>
+                    <th>রেফারেন্স রেঞ্জ</th>
+                    <th>পতাকা (Flag)</th>
+                  </tr>
+                </thead>
+                <tbody id="result-entry-fields">
+                  <!-- Dynamically populated parameters -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">পরীক্ষক টেকনোলজিস্ট (Technician)</label>
+                <input type="text" class="form-control form-control-sm" id="res-tech" value="কবির হোসেন (মেডিকেল টেকনোলজিস্ট)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">অনুমোদনকারী প্যাথলজিস্ট (Doctor)</label>
+                <input type="text" class="form-control form-control-sm" id="res-doc" value="ডা. আসিফ মাহমুদ (হেড অব প্যাথলজি)">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-success">ফলাফল যাচাই ও রিপোর্ট অনুমোদন করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let labOrders = [];
+    let resultModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('laboratory');
+      HMS.UI.renderAdminTopbar('ল্যাবরেটরি (LIS)', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'ল্যাবরেটরি', url: '#' }]);
+      loadLabData();
+    });
+
+    function loadLabData() {
+      labOrders = HMS.Storage.getCollection('lab_orders');
+      const catalog = HMS.Storage.getCollection('lab_catalog');
+
+      // Populate Catalog
+      const catTbody = document.getElementById('lab-catalog-table-body');
+      catTbody.innerHTML = catalog.map(c => `
+        <tr>
+          <td><span class="badge bg-light text-primary border">${c.code}</span></td>
+          <td class="fw-semibold text-hms-navy">${c.name}</td>
+          <td><span class="badge bg-secondary-subtle text-dark">${c.category}</span></td>
+          <td><small class="text-muted">${c.normal_range}</small></td>
+          <td>${c.turnaround_hours} ঘণ্টা</td>
+          <td><strong class="text-success">${HMS.I18n.formatCurrency(c.price)}</strong></td>
+        </tr>
+      `).join('');
+
+      filterLabOrders();
+    }
+
+    function filterLabOrders() {
+      const status = document.getElementById('lab-status-filter').value;
+      const filtered = labOrders.filter(l => !status || l.status === status);
+      renderLabOrdersTable(filtered);
+    }
+
+    function renderLabOrdersTable(list) {
+      const tbody = document.getElementById('lab-orders-table-body');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">কোনো ল্যাব অর্ডার পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(o => `
+        <tr>
+          <td><span class="badge bg-secondary">${o.order_no}</span></td>
+          <td>
+            <div class="font-monospace small fw-bold text-primary">${o.sample_id}</div>
+            <small class="text-muted" style="font-size:0.65rem">||||| | |||| |</small>
+          </td>
+          <td>
+            <div class="fw-bold text-hms-navy">${o.patient_name}</div>
+            <small class="text-primary">${o.uhid}</small>
+          </td>
+          <td><small class="fw-semibold">${o.tests.join(', ')}</small></td>
+          <td>
+            <div><small>${o.order_date}</small></div>
+            <small class="text-muted">${o.ordered_by || 'OPD'}</small>
+          </td>
+          <td><strong class="text-success">${HMS.I18n.formatCurrency(o.total_bill)}</strong></td>
+          <td>
+            <select class="form-select form-select-sm" style="width:130px; font-size:0.75rem;" onchange="updateLabStatus('${o.id}', this.value)">
+              <option value="Ordered" ${o.status === 'Ordered' ? 'selected' : ''}>Ordered</option>
+              <option value="Sample Collected" ${o.status === 'Sample Collected' ? 'selected' : ''}>Sample Collected</option>
+              <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
+              <option value="Approved" ${o.status === 'Approved' ? 'selected' : ''}>Approved</option>
+            </select>
+          </td>
+          <td class="text-end no-export">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary" onclick="openResultEntry('${o.id}')" title="ফলাফল এন্ট্রি">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              ${o.status === 'Approved' ? `
+                <button class="btn btn-outline-success" onclick="printLabReport('${o.id}')" title="অনুমোদিত রিপোর্ট প্রিন্ট">
+                  <i class="bi bi-printer"></i>
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateLabStatus(orderId, newStatus) {
+      HMS.Storage.update('lab_orders', orderId, { status: newStatus });
+      HMS.UI.showToast(`ল্যাব টেস্ট স্ট্যাটাস আপডেট: ${newStatus}`, 'success');
+      loadLabData();
+    }
+
+    function openResultEntry(orderId) {
+      const order = HMS.Storage.getById('lab_orders', orderId);
+      if (!order) return;
+      document.getElementById('res-order-id').value = order.id;
+      document.getElementById('res-patient-name').textContent = order.patient_name;
+      document.getElementById('res-tests-list').textContent = order.tests.join(' | ');
+      document.getElementById('res-sample-id').textContent = order.sample_id;
+
+      const tbody = document.getElementById('result-entry-fields');
+      const params = (order.results && order.results.length > 0) ? order.results : [
+        { test: 'Hemoglobin (Hb)', value: '13.5', unit: 'g/dL', normal: '12.0 - 16.0', flag: 'Normal' },
+        { test: 'Total WBC Count', value: '7,200', unit: '/cumm', normal: '4,000 - 11,000', flag: 'Normal' },
+        { test: 'Platelet Count', value: '250,000', unit: '/cumm', normal: '150,000 - 450,000', flag: 'Normal' },
+        { test: 'Fasting Blood Glucose', value: '6.8', unit: 'mmol/L', normal: '3.9 - 6.1', flag: 'High' }
+      ];
+
+      tbody.innerHTML = params.map((p, i) => `
+        <tr>
+          <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold" value="${p.test}" readonly></td>
+          <td><input type="text" class="form-control form-control-sm text-center fw-bold res-val" value="${p.value}" required></td>
+          <td><span class="text-muted small">${p.unit}</span></td>
+          <td><span class="text-muted small">${p.normal}</span></td>
+          <td>
+            <select class="form-select form-select-sm res-flag">
+              <option value="Normal" ${p.flag === 'Normal' ? 'selected' : ''}>Normal</option>
+              <option value="High" ${p.flag === 'High' ? 'selected' : ''}>High</option>
+              <option value="Low" ${p.flag === 'Low' ? 'selected' : ''}>Low</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+
+      resultModalInstance = new bootstrap.Modal(document.getElementById('resultEntryModal'));
+      resultModalInstance.show();
+    }
+
+    function handleResultSubmit(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('res-order-id').value;
+      const tech = document.getElementById('res-tech').value;
+      const doc = document.getElementById('res-doc').value;
+
+      // Extract results from table
+      const rows = document.querySelectorAll('#result-entry-fields tr');
+      let updatedResults = [];
+      rows.forEach(r => {
+        const testName = r.querySelector('input[readonly]').value;
+        const val = r.querySelector('.res-val').value;
+        const flag = r.querySelector('.res-flag').value;
+        updatedResults.push({
+          test: testName,
+          value: val,
+          unit: r.children[2].innerText,
+          normal: r.children[3].innerText,
+          flag: flag
+        });
+      });
+
+      HMS.Storage.update('lab_orders', orderId, {
+        status: 'Approved',
+        results: updatedResults,
+        verified_by: tech,
+        approved_by: doc
+      });
+
+      resultModalInstance.hide();
+      HMS.UI.showToast('ল্যাব ফলাফল সংরক্ষিত ও রিপোর্ট অনুমোদিত হয়েছে!', 'success');
+      loadLabData();
+    }
+
+    function printLabReport(orderId) {
+      const order = HMS.Storage.getById('lab_orders', orderId);
+      if (!order) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Diagnostic Report - ${order.order_no}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            .header { text-align: center; border-bottom: 2px solid #1677C8; padding-bottom: 12px; margin-bottom: 20px; }
+            .meta { background: #f1f5f9; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; font-size: 13px; }
+            th { background-color: #f8fafc; }
+            .flag-High { color: #dc2626; font-weight: bold; }
+            .flag-Low { color: #d97706; font-weight: bold; }
+          </style>
+        </head>
+        <body onload="window.print()">
+          <div class="header">
+            <h2 style="margin:0; color:#12304A;">CarePoint Multispecialty Hospital</h2>
+            <div>Pathology & Laboratory Medicine Department | Dhanmondi, Dhaka</div>
+            <h3>LABORATORY INVESTIGATION REPORT</h3>
+          </div>
+          <div class="meta">
+            <div><strong>Patient Name:</strong> ${order.patient_name} | <strong>UHID:</strong> ${order.uhid}</div>
+            <div><strong>Order No:</strong> ${order.order_no} | <strong>Sample ID:</strong> ${order.sample_id}</div>
+            <div><strong>Referred By:</strong> ${order.ordered_by || 'Dr. Consultant'} | <strong>Date:</strong> ${order.order_date}</div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Test Parameter</th><th>Observed Value</th><th>Unit</th><th>Reference Range</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              ${(order.results || []).map(r => `
+                <tr>
+                  <td><strong>${r.test}</strong></td>
+                  <td><strong>${r.value}</strong></td>
+                  <td>${r.unit}</td>
+                  <td>${r.normal}</td>
+                  <td class="flag-${r.flag}">${r.flag}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 13px;">
+            <div>
+              <strong>${order.verified_by || 'Medical Technologist'}</strong><br>
+              Verified By
+            </div>
+            <div style="text-align:right;">
+              <strong>${order.approved_by || 'Head of Pathology'}</strong><br>
+              Authorized Signature
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function openNewLabOrderModal() {
+      const p = prompt('রোগীর নাম লিখুন:', 'মো. রফিকুল ইসলাম');
+      if (!p) return;
+      const testName = prompt('টেস্টের নাম লিখুন:', 'Complete Blood Count (CBC)');
+      if (!testName) return;
+
+      const seq = labOrders.length + 1;
+      HMS.Storage.insert('lab_orders', {
+        id: `LBO-2026-${String(seq).padStart(3, '0')}`,
+        order_no: `CPH-LAB-${8000 + seq}`,
+        uhid: 'CPH-2026-0001',
+        patient_name: p,
+        tests: [testName],
+        sample_id: `SMP-2026-${900 + seq}`,
+        sample_type: 'Blood Specimen',
+        ordered_by: 'OPD Consultant',
+        order_date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        status: 'Sample Collected',
+        results: [
+          { test: testName, value: 'Normal', unit: 'Index', normal: 'Reference Index', flag: 'Normal' }
+        ],
+        total_bill: 800,
+        payment_status: 'Paid'
+      });
+
+      HMS.UI.showToast('নতুন ল্যাব অর্ডার সফলভাবে নিবন্ধিত হয়েছে!', 'success');
+      loadLabData();
+    }
+  </script>
+</body>
+</html>

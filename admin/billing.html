@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিলিং ও অ্যাকাউন্টস (Billing & Accounts) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">বিলিং, ইনভয়েস ও কালেকশন (Billing & Accounts)</h4>
+            <p class="text-muted small mb-0">সকল ইনভয়েস তালিকা, বকেয়া পর্যবেক্ষণ, ডিজিটাল পেমেন্ট ও মানি রিসিপ্ট</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('invoices-table', 'carepoint_invoices.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewInvoiceModal()">
+              <i class="bi bi-receipt me-1"></i>নতুন ইনভয়েস তৈরি
+            </button>
+          </div>
+        </div>
+
+        <!-- Invoices Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-cash-coin text-primary me-2"></i>ইনভয়েস ও ট্রানজ্যাকশন হিস্ট্রি</h6>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control form-control-sm" id="inv-search" placeholder="ইনভয়েস বা রোগীর নাম..." oninput="filterInvoices()">
+            </div>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="invoices-table">
+              <thead>
+                <tr>
+                  <th>ইনভয়েস নং</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>তারিখ ও সময়</th>
+                  <th>মোট বিল</th>
+                  <th>পরিশোধিত</th>
+                  <th>বকেয়া (Due)</th>
+                  <th>পেমেন্ট মেথড</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Collect Payment Modal -->
+  <div class="modal fade" id="collectPayModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy">বকেয়া বিল পরিশোধ গ্রহণ (Collect Payment)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handlePaymentSubmit(event)">
+          <div class="modal-body p-4">
+            <input type="hidden" id="cp-inv-id">
+            <div class="p-3 bg-light rounded-3 mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span>ইনভয়েস নং:</span>
+                <strong id="cp-inv-no"></strong>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span>রোগীর নাম:</span>
+                <strong id="cp-patient-name"></strong>
+              </div>
+              <div class="d-flex justify-content-between text-danger">
+                <span>বর্তমান বকেয়া (Due):</span>
+                <strong id="cp-due-amount"></strong>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">পরিশোধের পরিমাণ (৳) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="cp-pay-amount" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">পেমেন্ট মেথড <span class="text-danger">*</span></label>
+              <select class="form-select" id="cp-pay-method" required>
+                <option value="Cash Counter">ক্যাশ কাউন্টার (Cash)</option>
+                <option value="bKash (TrxID Demo)">বিকাশ (bKash Digital)</option>
+                <option value="Nagad">নগদ (Nagad)</option>
+                <option value="Rocket">রকেট (Rocket)</option>
+                <option value="Card (Visa/Mastercard)">ব্যাংক কার্ড (Card)</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-success">পেমেন্ট নিশ্চিত করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let invoicesList = [];
+    let payModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('billing');
+      HMS.UI.renderAdminTopbar('বিলিং ও অ্যাকাউন্টস', [{ title: 'ফাইন্যান্স', url: '#' }, { title: 'বিলিং', url: '#' }]);
+      loadInvoices();
+    });
+
+    function loadInvoices() {
+      invoicesList = HMS.Storage.getCollection('invoices');
+      filterInvoices();
+    }
+
+    function filterInvoices() {
+      const q = document.getElementById('inv-search').value.toLowerCase().trim();
+      const filtered = invoicesList.filter(i => 
+        !q || i.invoice_no.toLowerCase().includes(q) || i.patient_name.toLowerCase().includes(q) || i.uhid.toLowerCase().includes(q)
+      );
+      renderInvoicesTable(filtered);
+    }
+
+    function renderInvoicesTable(list) {
+      const tbody = document.getElementById('invoices-table-body');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-5 text-muted">কোনো ইনভয়েস পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(inv => `
+        <tr>
+          <td><span class="badge bg-secondary">${inv.invoice_no}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${inv.patient_name}</div>
+            <small class="text-primary">${inv.uhid}</small>
+          </td>
+          <td><small>${inv.date}</small></td>
+          <td><strong>${HMS.I18n.formatCurrency(inv.total)}</strong></td>
+          <td class="text-success">${HMS.I18n.formatCurrency(inv.paid_amount)}</td>
+          <td class="${inv.due_amount > 0 ? 'text-danger fw-bold' : 'text-muted'}">${HMS.I18n.formatCurrency(inv.due_amount)}</td>
+          <td><small class="text-muted">${inv.payment_method}</small></td>
+          <td>
+            <span class="hms-badge ${inv.status === 'Paid' ? 'badge-active' : (inv.status === 'Partial' ? 'badge-pending' : 'badge-cancelled')}">
+              <span class="hms-badge-dot"></span>${inv.status}
+            </span>
+          </td>
+          <td class="text-end no-export">
+            <div class="btn-group btn-group-sm">
+              ${inv.due_amount > 0 ? `
+                <button class="btn btn-outline-success" onclick="openPaymentModal('${inv.id}')" title="বকেয়া গ্রহণ করুন">
+                  <i class="bi bi-cash"></i> বিল গ্রহণ
+                </button>
+              ` : ''}
+              <button class="btn btn-outline-secondary" onclick="printInvoicePaper('${inv.id}')" title="রিসিপ্ট প্রিন্ট">
+                <i class="bi bi-printer"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openPaymentModal(invId) {
+      const inv = HMS.Storage.getById('invoices', invId);
+      if (!inv) return;
+      document.getElementById('cp-inv-id').value = inv.id;
+      document.getElementById('cp-inv-no').textContent = inv.invoice_no;
+      document.getElementById('cp-patient-name').textContent = inv.patient_name;
+      document.getElementById('cp-due-amount').textContent = HMS.I18n.formatCurrency(inv.due_amount);
+      document.getElementById('cp-pay-amount').value = inv.due_amount;
+
+      payModalInstance = new bootstrap.Modal(document.getElementById('collectPayModal'));
+      payModalInstance.show();
+    }
+
+    function handlePaymentSubmit(e) {
+      e.preventDefault();
+      const invId = document.getElementById('cp-inv-id').value;
+      const amount = Number(document.getElementById('cp-pay-amount').value);
+      const method = document.getElementById('cp-pay-method').value;
+
+      HMS.Storage.recordInvoicePayment(invId, amount, method);
+      payModalInstance.hide();
+      HMS.UI.showToast('পেমেন্ট সফলভাবে গৃহীত ও রেকর্ড আপডেট হয়েছে!', 'success');
+      loadInvoices();
+    }
+
+    function printInvoicePaper(invId) {
+      const inv = HMS.Storage.getById('invoices', invId);
+      if (!inv) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Hospital Bill Receipt - ${inv.invoice_no}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            .header { text-align: center; border-bottom: 2px solid #1677C8; padding-bottom: 12px; margin-bottom: 20px; }
+            .meta { background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; font-size: 13px; }
+            th { background-color: #f1f5f9; }
+            .total-row { font-weight: bold; font-size: 14px; background: #f8fafc; }
+          </style>
+        </head>
+        <body onload="window.print()">
+          <div class="header">
+            <h2 style="margin:0; color:#12304A;">CarePoint Multispecialty Hospital</h2>
+            <div>Plot 18, Road 7, Dhanmondi, Dhaka | Hotline: 10678</div>
+            <h3>PATIENT BILLING INVOICE & MONEY RECEIPT</h3>
+          </div>
+          <div class="meta">
+            <div><strong>Patient Name:</strong> ${inv.patient_name} | <strong>UHID:</strong> ${inv.uhid}</div>
+            <div><strong>Invoice No:</strong> ${inv.invoice_no} | <strong>Date:</strong> ${inv.date}</div>
+            <div><strong>Payment Method:</strong> ${inv.payment_method} | <strong>Cashier:</strong> ${inv.cashier || 'System Counter'}</div>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>Description of Service / Medicine</th><th>Qty</th><th>Rate</th><th>Amount (৳)</th></tr></thead>
+            <tbody>
+              ${(inv.items || []).map((it, idx) => `<tr><td>${idx+1}</td><td>${it.desc}</td><td>${it.qty}</td><td>৳${it.rate}</td><td>৳${it.amount}</td></tr>`).join('')}
+              <tr class="total-row"><td colspan="4" style="text-align:right;">Subtotal:</td><td>৳${inv.subtotal}</td></tr>
+              <tr><td colspan="4" style="text-align:right;">Discount:</td><td>৳${inv.discount || 0}</td></tr>
+              <tr><td colspan="4" style="text-align:right;">VAT (5%):</td><td>৳${inv.vat || 0}</td></tr>
+              <tr class="total-row"><td colspan="4" style="text-align:right;">Grand Total:</td><td>৳${inv.total}</td></tr>
+              <tr style="color:green; font-weight:bold;"><td colspan="4" style="text-align:right;">Paid Amount:</td><td>৳${inv.paid_amount}</td></tr>
+              <tr style="color:red; font-weight:bold;"><td colspan="4" style="text-align:right;">Net Due:</td><td>৳${inv.due_amount}</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top: 50px; text-align: right; font-size: 12px;">
+            __________________________<br>
+            Authorized Accounts Officer
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function openNewInvoiceModal() {
+      const p = prompt('রোগীর নাম লিখুন:', 'মো. রফিকুল ইসলাম');
+      if (!p) return;
+      const desc = prompt('সেবা বা চার্জের বিবরণ:', 'Doctor Special Consultation / Emergency Dressing');
+      if (!desc) return;
+      const amount = Number(prompt('বিল পরিমাণ (টাকা):', '1500')) || 1500;
+
+      const seq = invoicesList.length + 1;
+      HMS.Storage.insert('invoices', {
+        id: `INV-2026-${String(seq).padStart(3, '0')}`,
+        invoice_no: `CPH-INV-${9000 + seq}`,
+        date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        uhid: 'CPH-2026-0001',
+        patient_name: p,
+        items: [{ desc: desc, qty: 1, rate: amount, amount: amount }],
+        subtotal: amount,
+        discount: 0,
+        vat: amount * 0.05,
+        total: amount * 1.05,
+        paid_amount: amount * 1.05,
+        due_amount: 0,
+        payment_method: 'Cash Counter',
+        status: 'Paid',
+        cashier: 'হিসাবরক্ষক'
+      });
+
+      HMS.UI.showToast('নতুন ইনভয়েস সফলভাবে তৈরি ও ক্যাশ গৃহীত হয়েছে!', 'success');
+      loadInvoices();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>আমার টেস্ট রিপোর্টসমূহ | CarePoint Patient Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar patient-sidebar" id="patient-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="patient-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-file-earmark-check-fill text-primary me-2"></i>ল্যাবরেটরি ও রেডিওলজি রিপোর্ট</h4>
+            <p class="text-muted small mb-0">অনুমোদিত ডিজিটাল ডায়াগনস্টিক রিপোর্ট ডাউনলোড ও ভিউয়ার</p>
+          </div>
+        </div>
+
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">ডায়াগনস্টিক টেস্ট ও ফলাফলের তালিকা</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>অর্ডার নং</th>
+                  <th>পরীক্ষাসমূহ (Investigations)</th>
+                  <th>রেফারকারী চিকিৎসক</th>
+                  <th>তারিখ</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="my-reports-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderPatientSidebar('reports');
+      HMS.UI.renderPatientTopbar('আমার টেস্ট রিপোর্ট');
+      loadMyReports();
+    });
+
+    function loadMyReports() {
+      const uhid = 'CPH-2026-0001';
+      const labs = HMS.Storage.getCollection('lab_orders').filter(l => l.uhid === uhid);
+      const rads = HMS.Storage.getCollection('radiology_orders').filter(r => r.uhid === uhid);
+      const tbody = document.getElementById('my-reports-tbody');
+
+      let html = '';
+      labs.forEach(l => {
+        html += `
+          <tr>
+            <td><span class="badge bg-secondary">${l.order_no}</span></td>
+            <td><strong>${l.tests.join(', ')}</strong><br><small class="text-muted">Sample: ${l.sample_id}</small></td>
+            <td><small>${l.ordered_by || 'Consultant'}</small></td>
+            <td><small>${l.order_date}</small></td>
+            <td><span class="badge ${l.status === 'Approved' ? 'bg-success' : 'bg-warning'}">${l.status}</span></td>
+            <td class="text-end no-export">
+              ${l.status === 'Approved' ? `
+                <button class="btn btn-sm btn-outline-primary" onclick="printPatientLabReport('${l.id}')">
+                  <i class="bi bi-file-earmark-pdf"></i> রিপোর্ট দেখুন
+                </button>
+              ` : '<span class="text-muted small">প্রসেসিং</span>'}
+            </td>
+          </tr>
+        `;
+      });
+
+      rads.forEach(r => {
+        html += `
+          <tr>
+            <td><span class="badge bg-secondary">${r.order_no}</span></td>
+            <td><strong>${r.service_name}</strong><br><small class="text-muted">Category: ${r.category}</small></td>
+            <td><small>${r.radiologist}</small></td>
+            <td><small>${r.date}</small></td>
+            <td><span class="badge ${r.status === 'Approved' ? 'bg-success' : 'bg-warning'}">${r.status}</span></td>
+            <td class="text-end no-export">
+              <button class="btn btn-sm btn-outline-primary" onclick="alert('রেডিওলজি রিপোর্ট:\\n\\n' + '${r.findings}')">
+                <i class="bi bi-file-earmark-pdf"></i> রিপোর্ট দেখুন
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function printPatientLabReport(id) {
+      const order = HMS.Storage.getById('lab_orders', id);
+      if (!order) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Lab Report - ${order.order_no}</title>
+          <style>body{font-family:sans-serif; padding:40px;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #ccc; padding:8px 12px; font-size:13px; text-align:left;}</style>
+        </head>
+        <body onload="window.print()">
+          <h2 style="color:#12304A; text-align:center;">CarePoint Multispecialty Hospital</h2>
+          <h4 style="text-align:center; color:#1677C8;">PATIENT DIAGNOSTIC REPORT</h4>
+          <p><strong>Patient:</strong> ${order.patient_name} (${order.uhid}) | <strong>Date:</strong> ${order.order_date}</p>
+          <table>
+            <thead><tr><th>Parameter</th><th>Value</th><th>Unit</th><th>Reference Range</th></tr></thead>
+            <tbody>
+              ${(order.results || []).map(r => `<tr><td>${r.test}</td><td><strong>${r.value}</strong></td><td>${r.unit}</td><td>${r.normal}</td></tr>`).join('')}
+            </tbody>
+          </table>
+          <p style="margin-top:40px; text-align:right;">Verified by: ${order.approved_by || 'Head of Pathology'}</p>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

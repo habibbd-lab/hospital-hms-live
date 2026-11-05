@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অপারেশন থিয়েটার (OT Management) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">অপারেশন থিয়েটার ও সার্জারি শিডিউল (Operation Theatre - OT)</h4>
+            <p class="text-muted small mb-0">সার্জারি বুকিং, সার্জন ও অ্যানেস্থেসিওলজিস্ট রোস্টার এবং ওটি স্যুট ট্র্যাকিং</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('ot-table', 'carepoint_ot_schedules.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewSurgeryModal()">
+              <i class="bi bi-plus-circle me-1"></i>নতুন সার্জারি বুকিং
+            </button>
+          </div>
+        </div>
+
+        <!-- OT Schedules Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-scissors text-primary me-2"></i>নির্ধারিত সার্জারি তালিকা</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="ot-table">
+              <thead>
+                <tr>
+                  <th>ওটি স্যুট</th>
+                  <th>সার্জারির নাম</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>প্রধান সার্জন</th>
+                  <th>অ্যানেস্থেসিওলজিস্ট</th>
+                  <th>তারিখ ও সময়</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="ot-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let otList = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('operation-theatre');
+      HMS.UI.renderAdminTopbar('অপারেশন থিয়েটার', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'ওটি শিডিউল', url: '#' }]);
+      loadOtData();
+    });
+
+    function loadOtData() {
+      otList = HMS.Storage.getCollection('ot_schedules');
+      const tbody = document.getElementById('ot-table-body');
+      tbody.innerHTML = otList.map(ot => `
+        <tr>
+          <td><span class="badge bg-primary">${ot.ot_room}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${ot.surgery_name}</div>
+            <small class="text-muted">${ot.pre_op_clearance}</small>
+          </td>
+          <td>
+            <div class="fw-semibold">${ot.patient_name}</div>
+            <small class="text-primary">${ot.patient_uhid}</small>
+          </td>
+          <td><small class="fw-bold text-primary">${ot.lead_surgeon}</small></td>
+          <td><small class="text-muted">${ot.anesthesiologist}</small></td>
+          <td>
+            <div>${ot.date}</div>
+            <small class="text-muted">${ot.time}</small>
+          </td>
+          <td>
+            <span class="hms-badge ${ot.status === 'Completed' ? 'badge-active' : 'badge-pending'}">
+              <span class="hms-badge-dot"></span>${ot.status}
+            </span>
+          </td>
+          <td class="text-end no-export">
+            <button class="btn btn-sm btn-outline-success" onclick="markOtCompleted('${ot.id}')" title="সম্পন্ন চিহ্নিত করুন">
+              <i class="bi bi-check-lg"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function markOtCompleted(id) {
+      HMS.Storage.update('ot_schedules', id, { status: 'Completed' });
+      HMS.UI.showToast('সার্জারি সফলভাবে সম্পন্ন চিহ্নিত হয়েছে!', 'success');
+      loadOtData();
+    }
+
+    function openNewSurgeryModal() {
+      const name = prompt('সার্জারির নাম:', 'Laparoscopic Appendectomy');
+      if (!name) return;
+      const pName = prompt('রোগীর নাম:', 'সাবরিনা আক্তার');
+      if (!pName) return;
+
+      const seq = otList.length + 1;
+      HMS.Storage.insert('ot_schedules', {
+        id: `OT-${String(seq).padStart(2, '0')}`,
+        ot_room: 'OT-1 (General Surgical Suite)',
+        surgery_name: name,
+        patient_uhid: 'CPH-2026-0002',
+        patient_name: pName,
+        lead_surgeon: 'ডা. সাইফুল ইসলাম (FCPS)',
+        anesthesiologist: 'ডা. সানজিদা পারভীন',
+        date: new Date().toISOString().slice(0, 10),
+        time: '11:00 AM - 01:00 PM',
+        status: 'Scheduled',
+        pre_op_clearance: 'Cleared for General Anesthesia'
+      });
+
+      HMS.UI.showToast('নতুন সার্জারি সফলভাবে শিডিউল করা হয়েছে!', 'success');
+      loadOtData();
+    }
+  </script>
+</body>
+</html>

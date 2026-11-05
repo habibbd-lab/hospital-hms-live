@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাপয়েন্টমেন্ট ও কিউ ব্যবস্থাপনা | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">অ্যাপয়েন্টমেন্ট কিউ ও বুকিং (Appointments Queue)</h4>
+            <p class="text-muted small mb-0">দৈনিক সিরিয়াল টোকেন, রোগী আগমন স্ট্যাটাস ও ডাক্তার কিউ ট্র্যাকিং</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('apts-table', 'carepoint_appointments.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewAptModal()">
+              <i class="bi bi-calendar-plus me-1"></i>নতুন অ্যাপয়েন্টমেন্ট
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="hms-card p-3 mb-4 bg-white">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">তারিখ</label>
+              <input type="date" class="form-control" id="apt-date-filter" onchange="filterAppointments()">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">চিকিৎসক</label>
+              <select class="form-select" id="apt-doc-filter" onchange="filterAppointments()">
+                <option value="">সকল চিকিৎসক (All Doctors)</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">অবস্থা (Status)</label>
+              <select class="form-select" id="apt-status-filter" onchange="filterAppointments()">
+                <option value="">সকল অবস্থা</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Checked In">Checked In</option>
+                <option value="Waiting">Waiting</option>
+                <option value="In Consultation">In Consultation</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">অনুসন্ধান</label>
+              <input type="text" class="form-control" id="apt-search" placeholder="রোগীর নাম বা টোকেন..." oninput="filterAppointments()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointments Table -->
+        <div class="hms-card">
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="apts-table">
+              <thead>
+                <tr>
+                  <th>টোকেন নং</th>
+                  <th>অ্যাপয়েন্টমেন্ট আইডি</th>
+                  <th>রোগীর নাম ও ফোন</th>
+                  <th>চিকিৎসক ও বিভাগ</th>
+                  <th>তারিখ ও সময়</th>
+                  <th>ফি ও পেমেন্ট</th>
+                  <th>বর্তমান অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="apts-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- New Appointment Modal -->
+  <div class="modal fade" id="newAptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy"><i class="bi bi-calendar2-plus text-primary me-2"></i>নতুন অ্যাপয়েন্টমেন্ট বুকিং ফরম</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="saveAppointment(event)">
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">রোগী নির্বাচন / নাম <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="m-patient-name" placeholder="রোগীর নাম লিখুন" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="m-patient-phone" placeholder="017xxxxxxxx" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">চিকিৎসক <span class="text-danger">*</span></label>
+                <select class="form-select" id="m-doctor" required></select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">তারিখ <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="m-date" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">সময় স্লট <span class="text-danger">*</span></label>
+                <select class="form-select" id="m-slot" required>
+                  <option value="05:30 PM">05:30 PM</option>
+                  <option value="06:30 PM">06:30 PM</option>
+                  <option value="07:30 PM">07:30 PM</option>
+                  <option value="08:30 PM">08:30 PM</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">লক্ষণ বা কারণ (Symptoms)</label>
+                <input type="text" class="form-control" id="m-symptoms" placeholder="প্রধান শারীরিক সমস্যা...">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-hms-primary">সিরিয়াল নিশ্চিত করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let aptsList = [];
+    let aptModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('appointments');
+      HMS.UI.renderAdminTopbar('অ্যাপয়েন্টমেন্ট কিউ', [{ title: 'রোগী সেবা', url: '#' }, { title: 'অ্যাপয়েন্টমেন্ট', url: '#' }]);
+      initAppointments();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('action') === 'new') {
+        openNewAptModal();
+      }
+    });
+
+    function initAppointments() {
+      aptsList = HMS.Storage.getCollection('appointments');
+      const docs = HMS.Storage.getCollection('doctors');
+
+      const docFilter = document.getElementById('apt-doc-filter');
+      docFilter.innerHTML = '<option value="">সকল চিকিৎসক (All Doctors)</option>' + 
+        docs.map(d => `<option value="${d.id}">${d.name_bn}</option>`).join('');
+
+      const mDoc = document.getElementById('m-doctor');
+      mDoc.innerHTML = docs.map(d => `<option value="${d.id}" data-name="${d.name_bn}" data-dept="${d.dept_name}" data-fee="${d.fee}">${d.name_bn} (${d.dept_name})</option>`).join('');
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('m-date').value = today;
+
+      filterAppointments();
+    }
+
+    function filterAppointments() {
+      const q = document.getElementById('apt-search').value.toLowerCase().trim();
+      const date = document.getElementById('apt-date-filter').value;
+      const doc = document.getElementById('apt-doc-filter').value;
+      const status = document.getElementById('apt-status-filter').value;
+
+      const filtered = aptsList.filter(a => {
+        const matchesQuery = !q || a.patient_name.toLowerCase().includes(q) || a.appointment_no.toLowerCase().includes(q) || String(a.token_no).includes(q);
+        const matchesDate = !date || a.date === date;
+        const matchesDoc = !doc || a.doctor_id === doc;
+        const matchesStatus = !status || a.status === status;
+        return matchesQuery && matchesDate && matchesDoc && matchesStatus;
+      });
+
+      renderAppointmentsTable(filtered);
+    }
+
+    function renderAppointmentsTable(list) {
+      const tbody = document.getElementById('apts-table-body');
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">কোনো অ্যাপয়েন্টমেন্ট পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(a => `
+        <tr>
+          <td><span class="badge bg-primary fs-6">#${a.token_no}</span></td>
+          <td><small class="fw-bold">${a.appointment_no}</small></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${a.patient_name}</div>
+            <small class="text-muted">${a.patient_phone}</small>
+          </td>
+          <td>
+            <div class="fw-semibold text-primary">${a.doctor_name}</div>
+            <small class="text-muted">${a.dept_name}</small>
+          </td>
+          <td>
+            <div>${a.date}</div>
+            <small class="text-muted">${a.time_slot}</small>
+          </td>
+          <td>
+            <div class="fw-bold text-success">${HMS.I18n.formatCurrency(a.fee)}</div>
+            <span class="badge bg-success-subtle text-success">${a.payment_status || 'Paid'}</span>
+          </td>
+          <td>
+            <select class="form-select form-select-sm" style="width:130px; font-size:0.75rem;" onchange="updateAptStatus('${a.id}', this.value)">
+              <option value="Confirmed" ${a.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+              <option value="Checked In" ${a.status === 'Checked In' ? 'selected' : ''}>Checked In</option>
+              <option value="Waiting" ${a.status === 'Waiting' ? 'selected' : ''}>Waiting</option>
+              <option value="In Consultation" ${a.status === 'In Consultation' ? 'selected' : ''}>In Consultation</option>
+              <option value="Completed" ${a.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Cancelled" ${a.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+          </td>
+          <td class="text-end no-export">
+            <div class="btn-group btn-group-sm">
+              <a href="opd.html?apt_id=${a.id}" class="btn btn-outline-primary" title="ডাক্তার কনসালটেশন (OPD)">
+                <i class="bi bi-stethoscope"></i>
+              </a>
+              <button class="btn btn-outline-danger" onclick="deleteAppointment('${a.id}')" title="মুছুন">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateAptStatus(aptId, newStatus) {
+      HMS.Storage.update('appointments', aptId, { status: newStatus });
+      HMS.UI.showToast(`অ্যাপয়েন্টমেন্ট স্ট্যাটাস পরিবর্তিত হয়েছে: ${newStatus}`, 'success');
+      initAppointments();
+    }
+
+    function openNewAptModal() {
+      aptModalInstance = new bootstrap.Modal(document.getElementById('newAptModal'));
+      aptModalInstance.show();
+    }
+
+    function saveAppointment(e) {
+      e.preventDefault();
+      const docSelect = document.getElementById('m-doctor');
+      const opt = docSelect.options[docSelect.selectedIndex];
+      const docId = docSelect.value;
+      const docName = opt.getAttribute('data-name');
+      const deptName = opt.getAttribute('data-dept');
+      const fee = Number(opt.getAttribute('data-fee')) || 1200;
+
+      const pName = document.getElementById('m-patient-name').value;
+      const pPhone = document.getElementById('m-patient-phone').value;
+      const date = document.getElementById('m-date').value;
+      const slot = document.getElementById('m-slot').value;
+      const symptoms = document.getElementById('m-symptoms').value;
+
+      HMS.Storage.bookAppointment({
+        patient_uhid: 'CPH-2026-0001',
+        patient_name: pName,
+        patient_phone: pPhone,
+        doctor_id: docId,
+        doctor_name: docName,
+        dept_name: deptName,
+        date: date,
+        time_slot: slot,
+        fee: fee,
+        type: 'Walk-in / Counter',
+        symptoms: symptoms
+      });
+
+      aptModalInstance.hide();
+      HMS.UI.showToast('নতুন সিরিয়াল সফলভাবে বুক করা হয়েছে!', 'success');
+      initAppointments();
+      e.target.reset();
+    }
+
+    function deleteAppointment(id) {
+      if (confirm('আপনি কি এই অ্যাপয়েন্টমেন্ট বাতিল ও মুছে ফেলতে চান?')) {
+        HMS.Storage.delete('appointments', id);
+        HMS.UI.showToast('অ্যাপয়েন্টমেন্ট সফলভাবে মুছে ফেলা হয়েছে!', 'success');
+        initAppointments();
+      }
+    }
+  </script>
+</body>
+</html>

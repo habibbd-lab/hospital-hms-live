@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাডমিন ড্যাশবোর্ড | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js for real clinical and financial analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Demo Indicator Banner -->
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <!-- Admin Sidebar Placeholder -->
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+
+    <!-- Main Content Area -->
+    <main class="hms-main-content">
+      <!-- Admin Topbar Placeholder -->
+      <header id="admin-topbar-placeholder"></header>
+
+      <!-- Dashboard Content Container -->
+      <div class="dashboard-content">
+
+        <!-- Welcome Banner & Quick Actions -->
+        <div class="hms-card p-4 mb-4 bg-white border-0 shadow-sm">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <span class="badge bg-hms-blue mb-1" id="dash-role-badge">Super Admin Panel</span>
+              <h3 class="fw-bold text-hms-navy mb-1" id="dash-welcome-title">কেয়ারপয়েন্ট হাসপাতাল ম্যানেজমেন্ট সিস্টেম</h3>
+              <p class="text-muted small mb-0">আজকের লাইভ হাসপাতাল অপারেশন ও পরিসংখ্যান ওভারভিউ</p>
+            </div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <a href="patients.html?action=new" class="btn btn-hms-primary btn-sm">
+                <i class="bi bi-person-plus me-1"></i>নতুন রোগী
+              </a>
+              <a href="appointments.html?action=new" class="btn btn-hms-success btn-sm">
+                <i class="bi bi-calendar-plus me-1"></i>নতুন সিরিয়াল
+              </a>
+              <a href="ipd.html?action=new" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-hospital me-1"></i>বেড ভর্তি
+              </a>
+              <a href="pharmacy.html" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-cart-plus me-1"></i>ফার্মেসি POS
+              </a>
+              <a href="emergency.html" class="btn btn-danger btn-sm">
+                <i class="bi bi-exclamation-triangle me-1"></i>জরুরি ট্রায়াজ
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 Metric Statistic Cards (Dynamically Calculated from Demo Data) -->
+        <div class="row g-3 mb-4">
+          <!-- Total Patients -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>মোট নিবন্ধিত রোগী</h6>
+                <div class="stat-card-value text-hms-navy" id="stat-patients">০</div>
+                <div class="stat-card-sub text-success"><i class="bi bi-arrow-up-right me-1"></i>সক্রিয় স্বাস্থ্য প্রোফাইল</div>
+              </div>
+              <div class="stat-card-icon blue"><i class="bi bi-people-fill"></i></div>
+            </div>
+          </div>
+
+          <!-- Active Doctors -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>অন-ডিউটি চিকিৎসক</h6>
+                <div class="stat-card-value text-hms-blue" id="stat-doctors">০</div>
+                <div class="stat-card-sub text-muted">বিশেষায়িত বিভাগসমূহে</div>
+              </div>
+              <div class="stat-card-icon green"><i class="bi bi-heart-pulse-fill"></i></div>
+            </div>
+          </div>
+
+          <!-- Today's Appointments -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>আজকের অ্যাপয়েন্টমেন্ট</h6>
+                <div class="stat-card-value text-hms-green" id="stat-appointments">০</div>
+                <div class="stat-card-sub text-warning" id="stat-pending-apts">০ জন অপেক্ষমাণ</div>
+              </div>
+              <div class="stat-card-icon orange"><i class="bi bi-calendar-check-fill"></i></div>
+            </div>
+          </div>
+
+          <!-- Bed Occupancy -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>শয্যা ব্যবহার (Beds)</h6>
+                <div class="stat-card-value text-danger" id="stat-beds-occupied">০</div>
+                <div class="stat-card-sub text-success" id="stat-beds-available">০ টি শয্যা খালি</div>
+              </div>
+              <div class="stat-card-icon red"><i class="bi bi-door-closed-fill"></i></div>
+            </div>
+          </div>
+
+          <!-- Pending Labs -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>পেন্ডিং ল্যাব টেস্ট</h6>
+                <div class="stat-card-value text-warning" id="stat-labs">০</div>
+                <div class="stat-card-sub text-muted">প্রসেসিং ও ভেরিফিকেশনে</div>
+              </div>
+              <div class="stat-card-icon orange"><i class="bi bi-eyedropper"></i></div>
+            </div>
+          </div>
+
+          <!-- Today's Revenue -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>আজকের মোট আয়</h6>
+                <div class="stat-card-value text-success" id="stat-today-revenue">৳০</div>
+                <div class="stat-card-sub text-muted" id="stat-monthly-revenue">চলতি মাস: ৳০</div>
+              </div>
+              <div class="stat-card-icon green"><i class="bi bi-cash-coin"></i></div>
+            </div>
+          </div>
+
+          <!-- Emergency Cases -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>জরুরি ও ট্রায়াজ কেস</h6>
+                <div class="stat-card-value text-danger" id="stat-emergency">০</div>
+                <div class="stat-card-sub text-danger"><i class="bi bi-exclamation-circle me-1"></i>লাইভ ইমার্জেন্সি মনিটরিং</div>
+              </div>
+              <div class="stat-card-icon red"><i class="bi bi-hospital"></i></div>
+            </div>
+          </div>
+
+          <!-- Low Stock Warning -->
+          <div class="col-xl-3 col-sm-6">
+            <div class="stat-card">
+              <div class="stat-card-info">
+                <h6>ফার্মেসি স্বল্প স্টক</h6>
+                <div class="stat-card-value text-warning" id="stat-low-stock">০</div>
+                <div class="stat-card-sub text-muted">পুনরায় সংগ্রহের অনুরোধ</div>
+              </div>
+              <div class="stat-card-icon navy"><i class="bi bi-capsule"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real Chart.js Visualizations Row -->
+        <div class="row g-4 mb-4">
+          <!-- Patient Statistics Chart -->
+          <div class="col-lg-8">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-bar-chart-line text-primary me-2"></i>রোগী পরিসংখ্যান (OPD বনাম IPD ভর্তি ট্রেন্ড)</h6>
+                <span class="badge bg-light text-muted">সাপ্তাহিক বিশ্লেষণ</span>
+              </div>
+              <div class="hms-card-body">
+                <canvas id="patientTrendChart" height="110"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bed Occupancy Doughnut Chart -->
+          <div class="col-lg-4">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-pie-chart text-success me-2"></i>বেড ও ওয়ার্ড অকুপেন্সি</h6>
+                <span class="badge bg-light text-muted">রিয়েলটাইম</span>
+              </div>
+              <div class="hms-card-body d-flex flex-column align-items-center justify-content-center">
+                <div style="width: 220px; height: 220px;">
+                  <canvas id="bedOccupancyChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-around w-100 mt-3 pt-2 border-top small text-center">
+                  <div>
+                    <span class="badge bg-danger rounded-circle p-1 me-1"> </span>অধিকৃত: <strong id="chart-occ-val">০</strong>
+                  </div>
+                  <div>
+                    <span class="badge bg-success rounded-circle p-1 me-1"> </span>খালি: <strong id="chart-avail-val">০</strong>
+                  </div>
+                  <div>
+                    <span class="badge bg-warning rounded-circle p-1 me-1"> </span>মেরামত: <strong>১</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Trend & Department Distribution -->
+        <div class="row g-4 mb-4">
+          <!-- Revenue Line Chart -->
+          <div class="col-lg-7">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-graph-up-arrow text-success me-2"></i>আর্থিক রাজস্ব প্রবাহ (Monthly Revenue in ৳ BDT)</h6>
+                <span class="badge bg-success-subtle text-success">আর্থিক বছর ২০২৬</span>
+              </div>
+              <div class="hms-card-body">
+                <canvas id="revenueTrendChart" height="115"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Department Performance Bar Chart -->
+          <div class="col-lg-5">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-building-check text-primary me-2"></i>বিভাগীয় রোগী বিতরণ</h6>
+                <span class="badge bg-light text-muted">টপ ডিপার্টমেন্টস</span>
+              </div>
+              <div class="hms-card-body">
+                <canvas id="deptPerformanceChart" height="165"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Appointments & Recent Admissions Tables -->
+        <div class="row g-4 mb-4">
+          <!-- Recent Appointments -->
+          <div class="col-lg-7">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-clock-history text-primary me-2"></i>আজকের লাইভ অ্যাপয়েন্টমেন্ট কিউ</h6>
+                <a href="appointments.html" class="btn btn-sm btn-link text-decoration-none">সকল দেখুন</a>
+              </div>
+              <div class="hms-card-body p-0">
+                <div class="hms-table-responsive border-0">
+                  <table class="hms-table">
+                    <thead>
+                      <tr>
+                        <th>টোকেন</th>
+                        <th>রোগীর নাম</th>
+                        <th>চিকিৎসক</th>
+                        <th>সময়</th>
+                        <th>অবস্থা</th>
+                        <th>অ্যাকশন</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-appointments-table">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inpatient Admissions -->
+          <div class="col-lg-5">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-hospital text-danger me-2"></i>বর্তমান ইনপেশেন্ট ভর্তি (IPD)</h6>
+                <a href="ipd.html" class="btn btn-sm btn-link text-decoration-none">সকল দেখুন</a>
+              </div>
+              <div class="hms-card-body p-0">
+                <div class="hms-table-responsive border-0">
+                  <table class="hms-table">
+                    <thead>
+                      <tr>
+                        <th>ভর্তি নং</th>
+                        <th>রোগী</th>
+                        <th>বেড / ওয়ার্ড</th>
+                        <th>অবস্থা</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-admissions-table">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+
+  <!-- Admin Dashboard Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('dashboard');
+      HMS.UI.renderAdminTopbar('ড্যাশবোর্ড', [{ title: 'প্রধান', url: '#' }, { title: 'ড্যাশবোর্ড', url: '#' }]);
+      initDashboardData();
+      renderDashboardCharts();
+    });
+
+    function initDashboardData() {
+      const stats = HMS.Storage.calculateDashboardStats();
+      const user = HMS.Auth.getCurrentUser();
+
+      // Update Header
+      document.getElementById('dash-role-badge').textContent = `${user.name} (${user.role.toUpperCase()})`;
+
+      // Stat Counters
+      document.getElementById('stat-patients').textContent = HMS.I18n.formatNumber(stats.totalPatients);
+      document.getElementById('stat-doctors').textContent = HMS.I18n.formatNumber(stats.activeDoctors);
+      document.getElementById('stat-appointments').textContent = HMS.I18n.formatNumber(stats.totalAppointments);
+      document.getElementById('stat-pending-apts').textContent = `${HMS.I18n.formatNumber(stats.pendingAppointments)} জন অপেক্ষমাণ`;
+      document.getElementById('stat-beds-occupied').textContent = HMS.I18n.formatNumber(stats.occupiedBeds);
+      document.getElementById('stat-beds-available').textContent = `${HMS.I18n.formatNumber(stats.availableBeds)} টি শয্যা খালি`;
+      document.getElementById('stat-labs').textContent = HMS.I18n.formatNumber(stats.pendingLabs);
+      document.getElementById('stat-today-revenue').textContent = HMS.I18n.formatCurrency(stats.todayRevenue);
+      document.getElementById('stat-monthly-revenue').textContent = `চলতি মাস: ${HMS.I18n.formatCurrency(stats.monthlyRevenue)}`;
+      document.getElementById('stat-emergency').textContent = HMS.I18n.formatNumber(stats.emergencyCount);
+      document.getElementById('stat-low-stock').textContent = HMS.I18n.formatNumber(stats.lowStockCount);
+
+      document.getElementById('chart-occ-val').textContent = stats.occupiedBeds;
+      document.getElementById('chart-avail-val').textContent = stats.availableBeds;
+
+      // Populate Recent Appointments Table
+      const apts = HMS.Storage.getCollection('appointments');
+      const aptTable = document.getElementById('dash-appointments-table');
+      aptTable.innerHTML = apts.slice(0, 5).map(a => `
+        <tr>
+          <td><span class="badge bg-primary">#${a.token_no}</span></td>
+          <td>
+            <div class="fw-semibold text-hms-navy">${a.patient_name}</div>
+            <small class="text-muted">${a.appointment_no}</small>
+          </td>
+          <td><small>${a.doctor_name}</small></td>
+          <td><small>${a.time_slot}</small></td>
+          <td>
+            <span class="hms-badge badge-${a.status.toLowerCase().replace(' ', '')}">
+              <span class="hms-badge-dot"></span>${a.status}
+            </span>
+          </td>
+          <td>
+            <a href="opd.html?uhid=${a.patient_uhid}" class="btn btn-sm btn-outline-primary py-0 px-2" title="পরামর্শ শুরু করুন">
+              <i class="bi bi-stethoscope"></i>
+            </a>
+          </td>
+        </tr>
+      `).join('');
+
+      // Populate Recent Admissions Table
+      const adms = HMS.Storage.getCollection('admissions');
+      const admTable = document.getElementById('dash-admissions-table');
+      admTable.innerHTML = adms.slice(0, 5).map(adm => `
+        <tr>
+          <td><span class="badge bg-secondary">${adm.admission_no}</span></td>
+          <td>
+            <div class="fw-semibold text-hms-navy">${adm.patient_name}</div>
+            <small class="text-muted">${adm.admission_diagnosis}</small>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border">${adm.bed_number}</span>
+            <small class="d-block text-muted" style="font-size:0.75rem">${adm.ward_name}</small>
+          </td>
+          <td>
+            <span class="hms-badge badge-admitted">
+              <span class="hms-badge-dot"></span>${adm.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDashboardCharts() {
+      const stats = HMS.Storage.calculateDashboardStats();
+
+      // 1. Patient Trend Chart
+      const ctx1 = document.getElementById('patientTrendChart');
+      if (ctx1) {
+        new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: ['শনিবার', 'রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার'],
+            datasets: [
+              {
+                label: 'OPD রোগী',
+                data: [42, 58, 65, 52, 60, 48, 35],
+                borderColor: '#1677C8',
+                backgroundColor: 'rgba(22, 119, 200, 0.1)',
+                fill: true,
+                tension: 0.35
+              },
+              {
+                label: 'IPD নতুন ভর্তি',
+                data: [8, 12, 15, 10, 14, 9, 6],
+                borderColor: '#16A085',
+                backgroundColor: 'rgba(22, 160, 133, 0.1)',
+                fill: true,
+                tension: 0.35
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      // 2. Bed Occupancy Doughnut Chart
+      const ctx2 = document.getElementById('bedOccupancyChart');
+      if (ctx2) {
+        new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['অধিকৃত (Occupied)', 'খালি (Available)', 'মেরামত (Maintenance)'],
+            datasets: [{
+              data: [stats.occupiedBeds, stats.availableBeds, 1],
+              backgroundColor: ['#DC3545', '#16A34A', '#F59E0B'],
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
+
+      // 3. Revenue Trend Chart
+      const ctx3 = document.getElementById('revenueTrendChart');
+      if (ctx3) {
+        new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: ['মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর'],
+            datasets: [{
+              label: 'রাজস্ব আয় (৳)',
+              data: [2800000, 3100000, 3400000, 3250000, 3600000, 3950000, 4120000],
+              backgroundColor: '#1677C8',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      // 4. Department Performance Chart
+      const ctx4 = document.getElementById('deptPerformanceChart');
+      if (ctx4) {
+        new Chart(ctx4, {
+          type: 'bar',
+          data: {
+            labels: ['কার্ডিওলজি', 'মেডিসিন', 'অর্থোপেডিক', 'গাইনি', 'সার্জারি', 'নিউরো'],
+            datasets: [{
+              label: 'পরামর্শ সংখ্যা',
+              data: [85, 92, 64, 78, 55, 48],
+              backgroundColor: '#16A085',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            scales: { x: { beginAtZero: true } }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>

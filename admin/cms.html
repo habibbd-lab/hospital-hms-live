@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ওয়েবসাইট সিএমএস (Website CMS) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-globe2 text-primary me-2"></i>ওয়েবসাইট কনটেন্ট ম্যানেজমেন্ট (Website CMS)</h4>
+            <p class="text-muted small mb-0">পাবলিক হোমপেজ ব্যানার, জরুরি হটলাইন, হেলথ প্যাকেজ ও স্বাস্থ্য ব্লগ ম্যানেজমেন্ট</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="../index.html" target="_blank" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-box-arrow-up-right me-1"></i>লাইভ ওয়েবসাইট প্রিভিউ
+            </a>
+          </div>
+        </div>
+
+        <!-- CMS Sections Navigation Tabs -->
+        <div class="hms-card p-4">
+          <ul class="nav nav-pills mb-4" id="cms-tabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#cms-hero">হোমপেজ ও ব্যানার</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#cms-packages">হেলথ প্যাকেজ</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#cms-articles">স্বাস্থ্য ব্লগ ও সংবাদ</button></li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Hero Tab -->
+            <div class="tab-pane fade show active" id="cms-hero">
+              <form onsubmit="saveHeroCms(event)">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">হোমপেজ প্রধান শিরোনাম (Hero Title - Bangla)</label>
+                    <input type="text" class="form-control" id="cms-hero-title" value="উন্নত প্রযুক্তির চিকিৎসা ও মানবিক সেবায় বিশ্বস্ত প্রতিষ্ঠান" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold">সাব-টাইটেল ও পরিচিতি বিবরণ</label>
+                    <textarea class="form-control" id="cms-hero-sub" rows="3" required>২৪/৭ সার্বক্ষণিক জরুরি সেবা, অভিজ্ঞ অধ্যাপক ও বিশেষজ্ঞ চিকিৎসক দল, বিশ্বমানের আইসিইউ এবং অত্যাধুনিক ক্যাথেটারাইজেশন ল্যাব নিয়ে আমরা সর্বদা আপনার পাশে।</textarea>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">জরুরি হটলাইন নম্বর</label>
+                    <input type="text" class="form-control" id="cms-hotline" value="10678" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">জরুরি অ্যাম্বুলেন্স নম্বর</label>
+                    <input type="text" class="form-control" id="cms-ambulance" value="+880 1711-000999" required>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-hms-primary">ওয়েবসাইট পরিবর্তন সংরক্ষণ করুন</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Packages Tab -->
+            <div class="tab-pane fade" id="cms-packages">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-hms-navy mb-0">প্যাকেজ তালিকা</h6>
+                <button class="btn btn-sm btn-outline-primary" onclick="HMS.UI.showToast('নতুন প্যাকেজ যোগ করার ফর্ম সক্রিয়!', 'info')">+ নতুন প্যাকেজ</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr><th>প্যাকেজের নাম</th><th>মূল্য (৳)</th><th>অন্তর্ভুক্ত টেস্টসমূহ</th><th>অবস্থা</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>মৌলিক স্বাস্থ্য পরীক্ষা (Basic Wellness)</strong></td>
+                      <td>৳২,৫০০</td>
+                      <td>CBC with ESR, Fasting Blood Sugar, Serum Creatinine, Urine R/M/E</td>
+                      <td><span class="badge bg-success">প্রকাশিত</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>এক্সিকিউটিভ কার্ডিয়াক প্যাকেজ</strong></td>
+                      <td>৳৮,৫০০</td>
+                      <td>ECG 12-Lead, Echocardiogram with Doppler, Lipid Profile, S. Creatinine</td>
+                      <td><span class="badge bg-success">জনপ্রিয় / প্রকাশিত</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>সিনিয়র সিটিজেন স্বাস্থ্য প্যাকেজ</strong></td>
+                      <td>৳৬,২০০</td>
+                      <td>HbA1c, Liver Function, Kidney Function, USG Whole Abdomen</td>
+                      <td><span class="badge bg-success">প্রকাশিত</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Articles Tab -->
+            <div class="tab-pane fade" id="cms-articles">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-hms-navy mb-0">স্বাস্থ্য আর্টিকেল ও হাসপাতাল সংবাদ</h6>
+                <button class="btn btn-sm btn-outline-primary" onclick="openNewArticleModal()">+ নতুন আর্টিকেল লিখুন</button>
+              </div>
+              <div class="list-group list-group-flush" id="cms-articles-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('cms');
+      HMS.UI.renderAdminTopbar('ওয়েবসাইট CMS', [{ title: 'সিস্টেম', url: '#' }, { title: 'কনটেন্ট ম্যানেজমেন্ট', url: '#' }]);
+      renderCmsArticles();
+    });
+
+    function saveHeroCms(e) {
+      e.preventDefault();
+      const title = document.getElementById('cms-hero-title').value;
+      const sub = document.getElementById('cms-hero-sub').value;
+      HMS.SEED_DATA.cms.hero.title_bn = title;
+      HMS.SEED_DATA.cms.hero.subtitle_bn = sub;
+      HMS.UI.showToast('হোমপেজ ব্যানার তথ্য সফলভাবে হালনাগাদ হয়েছে!', 'success');
+    }
+
+    function renderCmsArticles() {
+      const articles = HMS.SEED_DATA.cms.news_and_articles;
+      const container = document.getElementById('cms-articles-list');
+      container.innerHTML = articles.map(art => `
+        <div class="list-group-item p-3 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge bg-light text-primary border">${art.category}</span>
+            <h6 class="mb-1 mt-1 fw-bold text-hms-navy">${art.title_bn}</h6>
+            <small class="text-muted">লেখক: ${art.author} | প্রকাশ: ${art.date}</small>
+          </div>
+          <div>
+            <span class="badge bg-success me-2">প্রকাশিত</span>
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="HMS.UI.showToast('আর্টিকেল এডিটর প্রস্তুত!', 'info')">এডিট</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openNewArticleModal() {
+      const title = prompt('আর্টিকেলের শিরোনাম লিখুন:');
+      if (title) {
+        HMS.SEED_DATA.cms.news_and_articles.unshift({
+          id: `ART-0${HMS.SEED_DATA.cms.news_and_articles.length + 1}`,
+          title_bn: title,
+          category: 'সাধারণ স্বাস্থ্য',
+          date: new Date().toISOString().slice(0, 10),
+          author: 'মেডিকেল রাইটার',
+          excerpt_bn: 'নতুন স্বাস্থ্য নিবন্ধনের বিবরণী।'
+        });
+        HMS.UI.showToast('নতুন আর্টিকেল সফলভাবে যুক্ত ও প্রকাশিত হয়েছে!', 'success');
+        renderCmsArticles();
+      }
+    }
+  </script>
+</body>
+</html>

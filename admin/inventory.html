@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ইনভেন্টরি ও প্রকিউরমেন্ট | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-box-seam-fill text-primary me-2"></i>ইনভেন্টরি ও প্রকিউরমেন্ট (Inventory & Procurement)</h4>
+            <p class="text-muted small mb-0">মেডিকেল কনজিউমেবলস স্টক, পারচেজ রিকুইজিশন ও সরবরাহকারী ব্যবস্থাপনা</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('inv-table', 'carepoint_inventory.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openPurchaseRequisition()">
+              <i class="bi bi-cart-plus me-1"></i>পারচেজ রিকুইজিশন তৈরি
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">হাসপাতাল সামগ্রী ও স্টক পর্যবেক্ষণ</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="inv-table">
+              <thead>
+                <tr>
+                  <th>আইটেম কোড</th>
+                  <th>সামগ্রীর নাম</th>
+                  <th>ক্যাটাগরি</th>
+                  <th>বর্তমান স্টক</th>
+                  <th>সর্বনিম্ন স্টক সীমা</th>
+                  <th>সরবরাহকারী (Supplier)</th>
+                  <th>ক্রয় মূল্য (৳)</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let inventoryList = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('inventory');
+      HMS.UI.renderAdminTopbar('ইনভেন্টরি', [{ title: 'প্রশাসন', url: '#' }, { title: 'ইনভেন্টরি ও প্রকিউরমেন্ট', url: '#' }]);
+      loadInventory();
+    });
+
+    function loadInventory() {
+      inventoryList = HMS.Storage.getCollection('inventory');
+      const tbody = document.getElementById('inventory-table-body');
+      tbody.innerHTML = inventoryList.map(item => `
+        <tr>
+          <td><span class="badge bg-secondary">${item.id}</span></td>
+          <td><strong class="text-hms-navy">${item.name}</strong></td>
+          <td><span class="badge bg-light text-dark border">${item.category}</span></td>
+          <td>
+            <strong class="${item.current_stock <= item.min_stock ? 'text-danger' : 'text-success'}">${item.current_stock} ${item.unit}</strong>
+          </td>
+          <td><small class="text-muted">${item.min_stock} ${item.unit}</small></td>
+          <td><small class="fw-semibold">${item.supplier}</small></td>
+          <td>${HMS.I18n.formatCurrency(item.last_purchase_price)}</td>
+          <td class="text-end no-export">
+            <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="adjustStock('${item.id}')">স্টক সমন্বয়</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function adjustStock(id) {
+      const item = HMS.Storage.getById('inventory', id);
+      if (!item) return;
+      const add = prompt(`${item.name} এর জন্য অতিরিক্ত কত স্টক যোগ করবেন?`, '500');
+      if (add) {
+        item.current_stock += Number(add);
+        HMS.Storage.save();
+        HMS.UI.showToast('স্টক সফলভাবে বৃদ্ধি করা হয়েছে!', 'success');
+        loadInventory();
+      }
+    }
+
+    function openPurchaseRequisition() {
+      const item = prompt('প্রয়োজনীয় সামগ্রীর নাম:', 'Surgical Face Masks (3-Ply)');
+      if (item) {
+        HMS.UI.showToast(`'${item}' এর পারচেজ অর্ডার রিকুইজিশন স্টোর ম্যানেজারের নিকট প্রেরিত হয়েছে!`, 'success');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বহিঃবিভাগ ও প্রেসক্রিপশন (OPD Management) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">বহিঃবিভাগ ও ডিজিটাল প্রেসক্রিপশন (OPD Consultation)</h4>
+            <p class="text-muted small mb-0">রোগী পরীক্ষা, ভাইটাল সাইন এন্ট্রি, প্রেসক্রিপশন ও ল্যাব টেস্ট রিকুইজিশন</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+              <i class="bi bi-printer me-1"></i>প্রেসক্রিপশন প্রিন্ট
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Left Column: Patient Queue -->
+          <div class="col-lg-4 no-print">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-people text-primary me-2"></i>অপেক্ষমাণ রোগী কিউ</h6>
+                <span class="badge bg-primary" id="queue-count">০</span>
+              </div>
+              <div class="p-3 border-bottom bg-light">
+                <input type="text" class="form-control form-control-sm" id="queue-search" placeholder="রোগীর নাম বা টোকেন..." oninput="filterQueue()">
+              </div>
+              <div class="list-group list-group-flush" id="queue-list-container" style="max-height: 520px; overflow-y: auto;">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Doctor Consultation & Prescription Workspace -->
+          <div class="col-lg-8">
+            <div class="prescription-paper shadow-sm" id="prescription-sheet">
+              <!-- Prescription Header -->
+              <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="brand-logo-icon" style="width:48px; height:48px; font-size:1.6rem;">
+                    <i class="bi bi-hospital"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold text-hms-navy mb-0">কেয়ারপয়েন্ট মাল্টিস্পেশালিটি হাসপাতাল</h5>
+                    <small class="text-muted">প্লট ১৮, রোড ৭, ধানমন্ডি, ঢাকা | হেল্পলাইন: 10678</small>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <h6 class="fw-bold text-primary mb-0" id="rx-doc-name">অধ্যাপক ডা. মিজানুর রহমান</h6>
+                  <small class="text-muted d-block" id="rx-doc-degrees">MBBS, FCPS (Cardiology), FACC (USA)</small>
+                  <small class="text-muted">কার্ডিওলজি বিভাগ | রুম: ৪০২</small>
+                </div>
+              </div>
+
+              <!-- Patient Banner -->
+              <div class="p-3 bg-light rounded-3 mb-4 d-flex justify-content-between flex-wrap gap-2 small">
+                <div><strong>রোগীর নাম:</strong> <span id="rx-p-name">মো. রফিকুল ইসলাম</span></div>
+                <div><strong>UHID:</strong> <span class="badge bg-primary text-uppercase" id="rx-p-uhid">CPH-2026-0001</span></div>
+                <div><strong>বয়স/লিঙ্গ:</strong> <span id="rx-p-age-gender">৫২ বছর / Male</span></div>
+                <div><strong>তারিখ:</strong> <span id="rx-date">০৬/১১/২০২৬</span></div>
+              </div>
+
+              <!-- Form for Clinical Consultation -->
+              <form id="opd-rx-form" onsubmit="saveOpdPrescription(event)">
+                <!-- Vitals Row -->
+                <div class="p-3 border rounded-3 mb-4 bg-white">
+                  <h6 class="fw-bold text-hms-navy mb-2 small text-uppercase"><i class="bi bi-activity text-danger me-1"></i>ভাইটাল সাইন ও শারীরিক মাপ</h6>
+                  <div class="row g-2">
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">BP (mmHg)</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-bp" value="130/85">
+                    </div>
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">Pulse (bpm)</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-pulse" value="76">
+                    </div>
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">Temp (°F)</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-temp" value="98.4">
+                    </div>
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">SpO2 (%)</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-spo2" value="98">
+                    </div>
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">ওজন (kg)</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-weight" value="72">
+                    </div>
+                    <div class="col-sm-2 col-4">
+                      <label class="form-label" style="font-size:0.75rem;">উচ্চতা</label>
+                      <input type="text" class="form-control form-control-sm" id="rx-height" value="5'7''">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Complaints & Clinical Diagnosis -->
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">প্রধান সমস্যা / Chief Complaints</label>
+                    <textarea class="form-control form-control-sm" id="rx-complaints" rows="2">হাঁটার সময় বুকে চাপ ও শ্বাসকষ্ট (২ সপ্তাহ)</textarea>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold">ক্লিনিকাল ডায়াগনোসিস / Diagnosis</label>
+                    <textarea class="form-control form-control-sm" id="rx-diagnosis" rows="2">Stable Angina Pectoris, Essential Hypertension, Type-2 Diabetes</textarea>
+                  </div>
+                </div>
+
+                <!-- Medicine Prescription Section with Rx symbol -->
+                <div class="mb-4">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="rx-symbol">℞</span>
+                      <h6 class="fw-bold text-hms-navy mb-0">ঔষধের তালিকা (Prescribed Medicines)</h6>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary no-print" onclick="addMedicineRow()">
+                      <i class="bi bi-plus-circle me-1"></i>ঔষধ যোগ করুন
+                    </button>
+                  </div>
+
+                  <div id="medicine-rows-container">
+                    <!-- Medicine Row 1 -->
+                    <div class="row g-2 mb-2 align-items-center medicine-entry">
+                      <div class="col-md-5">
+                        <input type="text" class="form-control form-control-sm med-name" placeholder="ঔষধের নাম (উদাঃ Tab. Osartil 50mg)" value="Tab. Osartil 50mg (Losartan)" required>
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control form-control-sm med-dose" placeholder="মাত্রা (উদাঃ ১+০+১)" value="১+০+০ (সকালে খাবার পর)">
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control form-control-sm med-duration" placeholder="মেয়াদ (উদাঃ ১ মাস)" value="১ মাস">
+                      </div>
+                      <div class="col-md-1 text-end no-print">
+                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeMedicineRow(this)"><i class="bi bi-trash"></i></button>
+                      </div>
+                    </div>
+
+                    <!-- Medicine Row 2 -->
+                    <div class="row g-2 mb-2 align-items-center medicine-entry">
+                      <div class="col-md-5">
+                        <input type="text" class="form-control form-control-sm med-name" placeholder="ঔষধের নাম" value="Tab. Rovista 10mg (Rosuvastatin)" required>
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control form-control-sm med-dose" placeholder="মাত্রা" value="০+০+১ (রাতে খাবার পর)">
+                      </div>
+                      <div class="col-md-3">
+                        <input type="text" class="form-control form-control-sm med-duration" placeholder="মেয়াদ" value="১ মাস">
+                      </div>
+                      <div class="col-md-1 text-end no-print">
+                        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeMedicineRow(this)"><i class="bi bi-trash"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Investigations & Advice -->
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-eyedropper text-primary me-1"></i>ল্যাব ও রেডিওলজি টেস্ট রিকুইজিশন</label>
+                    <textarea class="form-control form-control-sm" id="rx-tests" rows="3">1. Complete Blood Count (CBC) with ESR
+2. Lipid Profile (Fasting)
+3. Glycated Hemoglobin (HbA1c)
+4. Chest X-Ray Digital (P/A View)</textarea>
+                    <small class="text-muted" style="font-size:0.75rem;">সংরক্ষণ করলে স্বয়ংক্রিয়ভাবে ল্যাবরেটরিতে অর্ডার যুক্ত হবে।</small>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold"><i class="bi bi-info-circle text-success me-1"></i>পরামর্শ ও ফলোআপ</label>
+                    <textarea class="form-control form-control-sm" id="rx-advice" rows="3">তৈলাক্ত খাবার ও অতিরিক্ত লবণ পরিহার করুন। দৈনিক ৩০ মিনিট হাঁটুন। জরুরি অবস্থায় নাইট্রোগ্লিসারিন স্প্রে ব্যবহার করুন। ২১ দিন পর ফলোআপ।</textarea>
+                  </div>
+                </div>
+
+                <!-- Footer & Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top no-print">
+                  <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i>প্রিন্ট প্রিভিউ
+                  </button>
+                  <button type="submit" class="btn btn-hms-primary btn-lg">
+                    <i class="bi bi-check-circle me-1"></i>প্রেসক্রিপশন সংরক্ষণ ও ল্যাব রিকোয়েস্ট পাঠান
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let queueList = [];
+    let activePatientApt = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('opd');
+      HMS.UI.renderAdminTopbar('বহিঃবিভাগ (OPD)', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'OPD কনসালটেশন', url: '#' }]);
+      initOpdQueue();
+    });
+
+    function initOpdQueue() {
+      const apts = HMS.Storage.getCollection('appointments');
+      queueList = apts.filter(a => a.status !== 'Cancelled');
+      document.getElementById('queue-count').textContent = queueList.length;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlAptId = urlParams.get('apt_id');
+      const urlUhid = urlParams.get('uhid');
+
+      let selected = queueList[0];
+      if (urlAptId) {
+        selected = queueList.find(a => a.id === urlAptId) || selected;
+      } else if (urlUhid) {
+        selected = queueList.find(a => a.patient_uhid === urlUhid) || selected;
+      }
+
+      renderQueueList(queueList, selected ? selected.id : null);
+      if (selected) selectPatientForConsultation(selected);
+    }
+
+    function renderQueueList(list, activeId) {
+      const container = document.getElementById('queue-list-container');
+      if (list.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-muted small">আজকের কিউ খালি আছে।</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(a => `
+        <a href="#" class="list-group-item list-group-item-action ${a.id === activeId ? 'active' : ''} p-3" onclick="selectPatientForConsultationById('${a.id}'); return false;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge ${a.id === activeId ? 'bg-light text-dark' : 'bg-primary'}">টোকেন #${a.token_no}</span>
+            <small class="${a.id === activeId ? 'text-white' : 'text-muted'}">${a.time_slot}</small>
+          </div>
+          <div class="fw-bold ${a.id === activeId ? 'text-white' : 'text-hms-navy'}">${a.patient_name}</div>
+          <small class="${a.id === activeId ? 'text-light' : 'text-muted'} d-block">ডাক্তার: ${a.doctor_name}</small>
+          <span class="badge ${a.status === 'Completed' ? 'bg-success' : 'bg-warning'} mt-1" style="font-size:0.7rem">${a.status}</span>
+        </a>
+      `).join('');
+    }
+
+    function selectPatientForConsultationById(aptId) {
+      const apt = queueList.find(a => a.id === aptId);
+      if (apt) {
+        selectPatientForConsultation(apt);
+        renderQueueList(queueList, aptId);
+      }
+    }
+
+    function selectPatientForConsultation(apt) {
+      activePatientApt = apt;
+      document.getElementById('rx-p-name').textContent = apt.patient_name;
+      document.getElementById('rx-p-uhid').textContent = apt.patient_uhid || 'CPH-2026-0001';
+      document.getElementById('rx-doc-name').textContent = apt.doctor_name;
+      document.getElementById('rx-complaints').value = apt.symptoms || 'নিয়মিত চেকআপ ও পরামর্শ';
+      
+      const doc = HMS.Storage.getById('doctors', apt.doctor_id);
+      if (doc) {
+        document.getElementById('rx-doc-degrees').textContent = doc.degrees;
+      }
+    }
+
+    function addMedicineRow() {
+      const container = document.getElementById('medicine-rows-container');
+      const div = document.createElement('div');
+      div.className = 'row g-2 mb-2 align-items-center medicine-entry';
+      div.innerHTML = `
+        <div class="col-md-5">
+          <input type="text" class="form-control form-control-sm med-name" placeholder="ঔষধের নাম (যেমন Tab. Napa Extra)" required>
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control form-control-sm med-dose" placeholder="মাত্রা (যেমন ১+০+১)">
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control form-control-sm med-duration" placeholder="মেয়াদ (যেমন ৭ দিন)">
+        </div>
+        <div class="col-md-1 text-end no-print">
+          <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeMedicineRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function removeMedicineRow(btn) {
+      const entries = document.querySelectorAll('.medicine-entry');
+      if (entries.length > 1) {
+        btn.closest('.medicine-entry').remove();
+      } else {
+        alert('অন্তত একটি ঔষধ এন্ট্রি থাকতে হবে।');
+      }
+    }
+
+    function saveOpdPrescription(e) {
+      e.preventDefault();
+      if (!activePatientApt) {
+        alert('অনুগ্রহ করে কিউ থেকে রোগী নির্বাচন করুন।');
+        return;
+      }
+
+      // 1. Mark Appointment as Completed
+      HMS.Storage.update('appointments', activePatientApt.id, { status: 'Completed' });
+
+      // 2. Automatically generate a Lab Order if investigations are requested
+      const testsStr = document.getElementById('rx-tests').value.trim();
+      if (testsStr) {
+        const tests = testsStr.split('\n').map(t => t.replace(/^\d+[\.\)]\s*/, '').trim()).filter(Boolean);
+        const labOrders = HMS.Storage.getCollection('lab_orders');
+        const seq = labOrders.length + 1;
+        HMS.Storage.insert('lab_orders', {
+          id: `LBO-2026-${String(seq).padStart(3, '0')}`,
+          order_no: `CPH-LAB-${8000 + seq}`,
+          uhid: activePatientApt.patient_uhid,
+          patient_name: activePatientApt.patient_name,
+          tests: tests,
+          sample_id: `SMP-2026-${900 + seq}`,
+          sample_type: 'Blood / Urine Specimen',
+          ordered_by: activePatientApt.doctor_name,
+          order_date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+          status: 'Ordered',
+          results: [],
+          total_bill: tests.length * 800,
+          payment_status: 'Paid'
+        });
+      }
+
+      HMS.UI.showToast('প্রেসক্রিপশন সফলভাবে সংরক্ষিত ও ল্যাবরেটরি অর্ডার তৈরি হয়েছে!', 'success');
+      initOpdQueue();
+    }
+  </script>
+</body>
+</html>

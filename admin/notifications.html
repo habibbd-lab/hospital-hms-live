@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিজ্ঞপ্তি কেন্দ্র (Notifications) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>বিজ্ঞপ্তি কেন্দ্র (Notification Center)</h4>
+            <p class="text-muted small mb-0">হাসপাতালের সকল ইভেন্ট, ক্লিনিকাল সতর্কবার্তা ও সিস্টেম নোটিফিকেশন</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="markAllRead()">
+              <i class="bi bi-check2-all me-1"></i>সব পঠিত চিহ্নিত করুন
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="hms-card">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0">সাম্প্রতিক বিজ্ঞপ্তিসমূহ</h6>
+              </div>
+              <div class="list-group list-group-flush" id="notif-full-list">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="hms-card p-4">
+              <h6 class="fw-bold text-hms-navy mb-3"><i class="bi bi-sliders text-primary me-2"></i>বিজ্ঞপ্তি চ্যানেল সেটিংস</h6>
+              <div class="mb-3 form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="smsNotif" checked>
+                <label class="form-check-label small" for="smsNotif">এসএমএস গেটওয়ে ইন্টিগ্রেশন (Demo)</label>
+              </div>
+              <div class="mb-3 form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                <label class="form-check-label small" for="emailNotif">ইমেইল নোটিফিকেশন সার্ভিস (Demo)</label>
+              </div>
+              <div class="mb-3 form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="alertNotif" checked>
+                <label class="form-check-label small" for="alertNotif">ক্রিটিক্যাল ল্যাব রেজাল্ট অ্যালার্ট</label>
+              </div>
+              <button class="btn btn-sm btn-outline-primary w-100" onclick="HMS.UI.showToast('বিজ্ঞপ্তি পছন্দসমূহ সংরক্ষিত হয়েছে!', 'success')">সংরক্ষণ করুন</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('notifications');
+      HMS.UI.renderAdminTopbar('বিজ্ঞপ্তি কেন্দ্র', [{ title: 'সিস্টেম', url: '#' }, { title: 'নোটিফিকেশন', url: '#' }]);
+      renderNotifications();
+    });
+
+    function renderNotifications() {
+      const list = HMS.Storage.getCollection('notifications');
+      const container = document.getElementById('notif-full-list');
+      container.innerHTML = list.map(n => `
+        <div class="list-group-item p-3 d-flex justify-content-between align-items-center ${n.unread ? 'bg-light' : ''}">
+          <div class="d-flex align-items-center gap-3">
+            <div class="stat-icon ${n.type === 'Emergency' ? 'red' : (n.type === 'Lab' ? 'blue' : 'green')}" style="width:42px; height:42px; font-size:1.2rem;">
+              <i class="bi bi-bell"></i>
+            </div>
+            <div>
+              <div class="fw-bold text-hms-navy">${n.title}</div>
+              <div class="text-muted small">${n.desc}</div>
+              <small class="text-secondary" style="font-size:0.75rem">${n.time}</small>
+            </div>
+          </div>
+          ${n.unread ? '<span class="badge bg-primary">নতুন</span>' : ''}
+        </div>
+      `).join('');
+    }
+
+    function markAllRead() {
+      const list = HMS.Storage.getCollection('notifications');
+      list.forEach(n => n.unread = false);
+      HMS.Storage.save();
+      HMS.UI.showToast('সকল বিজ্ঞপ্তি পঠিত চিহ্নিত হয়েছে!', 'success');
+      renderNotifications();
+    }
+  </script>
+</body>
+</html>

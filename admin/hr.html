@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>এইচআর ও পেরোল ব্যবস্থাপনা (HR & Payroll) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-people-fill text-primary me-2"></i>মানবসম্পদ ও পেরোল (HR & Payroll)</h4>
+            <p class="text-muted small mb-0">হাসপাতাল কর্মী ব্যবস্থাপনা, দৈনিক উপস্থিতি, ছুটি ও বেতন পে-স্লিপ</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('hr-table', 'carepoint_employees.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewEmpModal()">
+              <i class="bi bi-person-plus-fill me-1"></i>নতুন কর্মী যোগ করুন
+            </button>
+          </div>
+        </div>
+
+        <!-- Employees Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">হাসপাতাল কর্মকর্তা ও কর্মচারীবৃন্দ</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="hr-table">
+              <thead>
+                <tr>
+                  <th>কর্মী আইডি</th>
+                  <th>নাম ও পদবী</th>
+                  <th>বিভাগ</th>
+                  <th>মাসিক মোট বেতন</th>
+                  <th>যোগদানের তারিখ</th>
+                  <th>আজকের উপস্থিতি</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="employees-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let empList = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('hr');
+      HMS.UI.renderAdminTopbar('এইচআর ও পেরোল', [{ title: 'প্রশাসন', url: '#' }, { title: 'মানবসম্পদ', url: '#' }]);
+      loadEmployees();
+    });
+
+    function loadEmployees() {
+      empList = HMS.Storage.getCollection('employees');
+      const tbody = document.getElementById('employees-table-body');
+      tbody.innerHTML = empList.map(e => `
+        <tr>
+          <td><span class="badge bg-secondary">${e.id}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${e.name}</div>
+            <small class="text-primary">${e.designation}</small>
+          </td>
+          <td><span class="badge bg-light text-dark border">${e.dept}</span></td>
+          <td><strong>${HMS.I18n.formatCurrency(e.salary)}</strong></td>
+          <td><small class="text-muted">${e.join_date}</small></td>
+          <td>
+            <button class="btn btn-sm ${e.attendance === 'Present' ? 'btn-outline-success' : 'btn-outline-warning'} py-0 px-2" onclick="toggleAttendance('${e.id}')">
+              ${e.attendance === 'Present' ? '<i class="bi bi-check-circle me-1"></i>উপস্থিত' : 'ছুটিতে'}
+            </button>
+          </td>
+          <td class="text-end no-export">
+            <button class="btn btn-sm btn-outline-primary" onclick="printPayslip('${e.id}')" title="পে-স্লিপ প্রিন্ট">
+              <i class="bi bi-file-earmark-text"></i> পে-স্লিপ
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleAttendance(id) {
+      const emp = HMS.Storage.getById('employees', id);
+      if (!emp) return;
+      const newAtt = emp.attendance === 'Present' ? 'On Leave' : 'Present';
+      HMS.Storage.update('employees', id, { attendance: newAtt });
+      HMS.UI.showToast(`উপস্থিতি স্ট্যাটাস আপডেট: ${newAtt}`, 'success');
+      loadEmployees();
+    }
+
+    function printPayslip(id) {
+      const emp = HMS.Storage.getById('employees', id);
+      if (!emp) return;
+      const basic = Math.round(emp.salary * 0.6);
+      const house = Math.round(emp.salary * 0.25);
+      const medical = Math.round(emp.salary * 0.15);
+      const pf = Math.round(basic * 0.08);
+      const netPay = (basic + house + medical) - pf;
+
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Payslip - ${emp.name}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            .header { text-align: center; border-bottom: 2px solid #1677C8; padding-bottom: 12px; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; font-size: 13px; }
+            th { background: #f8fafc; }
+          </style>
+        </head>
+        <body onload="window.print()">
+          <div class="header">
+            <h2>CarePoint Multispecialty Hospital</h2>
+            <div>Human Resources & Payroll Department | Dhaka</div>
+            <h3>MONTHLY SALARY PAYSLIP (নভেম্বর ২০২৬)</h3>
+          </div>
+          <div style="margin-bottom: 15px; font-size: 14px;">
+            <div><strong>Employee Name:</strong> ${emp.name} | <strong>ID:</strong> ${emp.id}</div>
+            <div><strong>Designation:</strong> ${emp.designation} | <strong>Department:</strong> ${emp.dept}</div>
+          </div>
+          <table>
+            <thead><tr><th>Earnings (উপার্জন)</th><th>Amount (৳)</th><th>Deductions (কর্তন)</th><th>Amount (৳)</th></tr></thead>
+            <tbody>
+              <tr><td>Basic Salary (মূল বেতন)</td><td>৳${basic.toLocaleString()}</td><td>Provident Fund (PF 8%)</td><td>৳${pf.toLocaleString()}</td></tr>
+              <tr><td>House Rent Allowance (বাড়ি ভাড়া)</td><td>৳${house.toLocaleString()}</td><td>Tax Deductions</td><td>৳0</td></tr>
+              <tr><td>Medical Allowance (চিকিৎসা ভাতা)</td><td>৳${medical.toLocaleString()}</td><td>-</td><td>-</td></tr>
+              <tr style="font-weight:bold; background:#f1f5f9;"><td>Gross Earnings:</td><td>৳${emp.salary.toLocaleString()}</td><td>Total Deductions:</td><td>৳${pf.toLocaleString()}</td></tr>
+              <tr style="font-size:16px; font-weight:bold; color:green;"><td colspan="3" style="text-align:right;">Net Payable Salary (নীট প্রদেয় বেতন):</td><td>৳${netPay.toLocaleString()}</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+            <div>________________________<br>Employee Signature</div>
+            <div>________________________<br>Accounts & HR Manager</div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    function openNewEmpModal() {
+      const name = prompt('কর্মীর নাম:');
+      if (!name) return;
+      const desig = prompt('পদবী:', 'স্টাফ নার্স');
+      if (!desig) return;
+      const salary = Number(prompt('মাসিক বেতন (টাকা):', '35000')) || 35000;
+
+      const seq = empList.length + 1;
+      HMS.Storage.insert('employees', {
+        id: `EMP-${String(seq).padStart(2, '0')}`,
+        name: name,
+        designation: desig,
+        dept: 'Nursing & Care',
+        salary: salary,
+        join_date: new Date().toISOString().slice(0, 10),
+        phone: '+880 1711-000000',
+        attendance: 'Present'
+      });
+
+      HMS.UI.showToast('নতুন কর্মী সফলভাবে নিবন্ধিত হয়েছে!', 'success');
+      loadEmployees();
+    }
+  </script>
+</body>
+</html>

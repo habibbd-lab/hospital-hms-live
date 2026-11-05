@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>সহায়ক হাসপাতাল মডিউলসমূহ | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-boxes text-primary me-2"></i>সহায়ক হাসপাতাল অপারেশন মডিউল (Auxiliary Hospital Services)</h4>
+            <p class="text-muted small mb-0">ডায়েট ও পুষ্টি, হাউসকিপিং, লন্ড্রি, বায়ো-মেডিকেল রক্ষণাবেক্ষণ, ভিজিটর ও সিকিউরিটি</p>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Diet & Nutrition -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-egg-fried text-warning fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">ডায়েট ও ক্লিনিকাল নিউট্রিশন</h5>
+              <p class="small text-muted mb-3">ইনপেশেন্ট ডায়াবেটিক, রেনাল, লো-সোডিয়াম ও লিকুইড পথ্য চার্ট নির্ধারণ ও অটোমেশন।</p>
+              <button class="btn btn-sm btn-outline-primary w-100 mt-auto" onclick="HMS.UI.showToast('ডায়েট চার্ট জেনারেটর লোড হচ্ছে...', 'info')">ডায়েট প্ল্যান কনফিগারেশন</button>
+            </div>
+          </div>
+
+          <!-- Housekeeping -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-trash3 text-success fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">হাউসকিপিং ও স্যানিটেশন</h5>
+              <p class="small text-muted mb-3">ওয়ার্ড, কেবিন ও ওটি জীবাণুমুক্তকরণ রোস্টার, ক্লিনিং শিফট ও ইন্সপেকশন লগ।</p>
+              <button class="btn btn-sm btn-outline-success w-100 mt-auto" onclick="HMS.UI.showToast('স্যানিটেশন শিফট শিডিউল হালনাগাদ!', 'success')">ক্লিনিং চেকলিস্ট দেখুন</button>
+            </div>
+          </div>
+
+          <!-- Laundry -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-water text-info fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">লন্ড্রি ও লিনেন ব্যবস্থাপনা</h5>
+              <p class="small text-muted mb-3">হাসপাতালের বিছানার চাদর, ওটি গাউন ও বালিশের কভারের লন্ড্রি ব্যাচ ট্র্যাকিং।</p>
+              <button class="btn btn-sm btn-outline-info w-100 mt-auto" onclick="HMS.UI.showToast('লন্ড্রি ব্যাচ প্রস্তুত!', 'info')">লিনেন ইনভেন্টরি</button>
+            </div>
+          </div>
+
+          <!-- Biomedical Equipment -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-cpu text-primary fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">বায়োমেডিকেল সরঞ্জাম ও ক্যালিব্রেশন</h5>
+              <p class="small text-muted mb-3">ভেন্টিলেটর, ডিফিব্রিলেটর, ক্যাথল্যাব অ্যানালাইজারের প্রতিরোধমূলক রক্ষণাবেক্ষণ (PPM)।</p>
+              <button class="btn btn-sm btn-outline-primary w-100 mt-auto" onclick="HMS.UI.showToast('ক্যালিব্রেশন সার্টিফিকেট আপ-টু-ডেট!', 'success')">ক্যালিব্রেশন লগ</button>
+            </div>
+          </div>
+
+          <!-- Telemedicine -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-camera-video text-danger fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">টেলিমেডিসিন ও ভার্চুয়াল কনসালটেশন</h5>
+              <p class="small text-muted mb-3">দূরবর্তী অঞ্চলের রোগীদের জন্য অনলাইনে বিশেষজ্ঞ ডাক্তারের ভিডিও কল ও ই-প্রেসক্রিপশন।</p>
+              <button class="btn btn-sm btn-outline-danger w-100 mt-auto" onclick="HMS.UI.showToast('ভার্চুয়াল ওয়েটিং রুম সক্রিয়!', 'info')">টেলিমেডিসিন রুম শুরু</button>
+            </div>
+          </div>
+
+          <!-- Visitor & Security Management -->
+          <div class="col-md-6 col-lg-4">
+            <div class="hms-card p-4 h-100">
+              <i class="bi bi-shield-lock text-dark fs-1 mb-2"></i>
+              <h5 class="fw-bold text-hms-navy">ভিজিটর ও সিকিউরিটি পাস</h5>
+              <p class="small text-muted mb-3">আইসিইউ ও ওয়ার্ডে রোগীর স্বজনদের প্রবেশাধিকার নিয়ন্ত্রণ, ডিজিটাল ভিজিটর পাস ও সিসিটিভি।</p>
+              <button class="btn btn-sm btn-outline-dark w-100 mt-auto" onclick="HMS.UI.showToast('ডিজিটাল ভিজিটর পাস ইস্যু করা হয়েছে!', 'success')">ভিজিটর পাস তৈরি</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('additional-modules');
+      HMS.UI.renderAdminTopbar('সহায়ক হাসপাতাল মডিউলসমূহ', [{ title: 'অপারেশন', url: '#' }, { title: 'অতিরিক্ত মডিউল', url: '#' }]);
+    });
+  </script>
+</body>
+</html>

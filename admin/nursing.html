@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>নার্সিং স্টেশন ও কেয়ার প্ল্যান (Nursing Station) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">নার্সিং স্টেশন ও পরিচর্যা ব্যবস্থাপনা (Nursing Station)</h4>
+            <p class="text-muted small mb-0">ঔষধ সেবন ট্র্যাকিং (MAR), রোগীর ভাইটাল সাইন লগ ও শিফট হ্যান্ডওভার</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-hms-primary btn-sm" onclick="openShiftHandoverModal()">
+              <i class="bi bi-arrow-left-right me-1"></i>শিফট হ্যান্ডওভার রিপোর্ট
+            </button>
+          </div>
+        </div>
+
+        <!-- Assigned Patients & Medication Administration Records (MAR) -->
+        <div class="hms-card mb-4">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-capsule-pill text-primary me-2"></i>মেডিকেশন অ্যাডমিনিস্ট্রেশন রেকর্ড (MAR Checklist)</h6>
+            <span class="badge bg-light text-muted">আজকের শিফট: সকাল ৮:০০ - দুপুর ২:০০</span>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>বেড নং</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>নির্ধারিত ঔষুধ</th>
+                  <th>রুট ও মাত্রা</th>
+                  <th>সকাল (8AM)</th>
+                  <th>দুপুর (2PM)</th>
+                  <th>রাত (8PM)</th>
+                  <th>নার্স নোট</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge bg-danger">CCU-02</span></td>
+                  <td>
+                    <div class="fw-bold text-hms-navy">কাজী আনোয়ার হোসেন</div>
+                    <small class="text-primary">CPH-2026-0003</small>
+                  </td>
+                  <td>Inj. Enoxaparin 60mg<br>Tab. Osartil 50mg</td>
+                  <td>Subcutaneous<br>Oral</td>
+                  <td><button class="btn btn-sm btn-success py-0 px-2" onclick="HMS.UI.showToast('সকালের ডোজ সম্পন্ন চিহ্নিত!', 'success')"><i class="bi bi-check-lg"></i> দেওয়া হয়েছে</button></td>
+                  <td><button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="HMS.UI.showToast('দুপুরের ডোজ নথিভুক্ত!', 'info')">দেওয়া হয়নি</button></td>
+                  <td><span class="badge bg-light text-muted">শিডিউল</span></td>
+                  <td><small class="text-muted">বিপি ও পালস স্বাভাবিক। ব্যথা নেই।</small></td>
+                </tr>
+                <tr>
+                  <td><span class="badge bg-warning text-dark">ICU-01</span></td>
+                  <td>
+                    <div class="fw-bold text-hms-navy">আব্দুল কাদের</div>
+                    <small class="text-primary">CPH-2026-0015</small>
+                  </td>
+                  <td>Inj. Meropenem 1g<br>Inj. Furosemide 20mg</td>
+                  <td>IV Infusion<br>IV Stat</td>
+                  <td><button class="btn btn-sm btn-success py-0 px-2"><i class="bi bi-check-lg"></i> দেওয়া হয়েছে</button></td>
+                  <td><button class="btn btn-sm btn-outline-secondary py-0 px-2">দেওয়া হয়নি</button></td>
+                  <td><span class="badge bg-light text-muted">শিডিউল</span></td>
+                  <td><small class="text-muted">ভেন্টিলেটর মোড স্থিতিশীল। স্যালাইনের গতি স্বাভাবিক।</small></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Shift Handover Card -->
+        <div class="hms-card p-4">
+          <h5 class="fw-bold text-hms-navy mb-3"><i class="bi bi-journal-text text-success me-2"></i>নার্সিং শিফট হ্যান্ডওভার লগবুক</h5>
+          <div class="p-3 bg-light rounded-3 mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <strong>ডিউটি ইনচার্জ: মোছা. নাসরিন জাহান (সিনিয়র স্টাফ নার্স)</strong>
+              <span class="badge bg-info text-dark">সকাল শিফট সম্পন্ন</span>
+            </div>
+            <p class="small text-muted mb-0">
+              ওয়ার্ডের মোট ভর্তি রোগী: ৪ জন। CCU-02 এর রোগীর ব্লাড সুগার মনিটরিং সম্পন্ন (FBS 7.2 mmol/L)। ICU-01 রোগীর ট্র্যাকিওস্টমি সাকশন সম্পন্ন হয়েছে। সকল রোগীর জরুরি ইনজেকশন চার্ট অনুযায়ী দেওয়া হয়েছে।
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('nursing');
+      HMS.UI.renderAdminTopbar('নার্সিং স্টেশন', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'নার্সিং', url: '#' }]);
+    });
+
+    function openShiftHandoverModal() {
+      const note = prompt('পরবর্তী শিফটের নার্সের জন্য বিশেষ নোট লিখুন:', 'সকল বেডের স্যালাইন ও ক্যাথিটার ড্রেনেজ ব্যাগ পর্যবেক্ষণ সম্পন্ন।');
+      if (note) {
+        HMS.UI.showToast('শিফট হ্যান্ডওভার লগ সফলভাবে সংরক্ষিত হয়েছে!', 'success');
+      }
+    }
+  </script>
+</body>
+</html>

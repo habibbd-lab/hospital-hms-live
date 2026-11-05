@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>লগইন ও ভূমিকা নির্বাচন (Demo Portal Login) | কেয়ারপয়েন্ট হাসপাতাল</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body class="bg-light">
+
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="container py-5">
+    <div class="text-center mb-4">
+      <a href="index.html" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-2">
+        <div class="brand-logo-icon">
+          <i class="bi bi-hospital"></i>
+        </div>
+        <h3 class="fw-bold text-hms-navy mb-0">CarePoint Hospital</h3>
+      </a>
+      <p class="text-muted small">হাসপাতাল ব্যবস্থাপনা সিস্টেম (HMS) ও পেশেন্ট পোর্টাল ডেমো লগইন</p>
+    </div>
+
+    <!-- Quick Role Login Section -->
+    <div class="hms-card p-4 p-md-5 mb-5 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 pb-2 border-bottom">
+        <div>
+          <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-people-fill text-primary me-2"></i>এক ক্লিকে ভূমিকা ভিত্তিক ডেমো লগইন (Quick Role Select)</h4>
+          <p class="text-muted small mb-0">যেকোনো ডেমো অ্যাকাউন্টে প্রবেশ করতে নিচের যেকোনো ভূমিকায় ক্লিক করুন</p>
+        </div>
+        <span class="badge bg-warning text-dark px-3 py-2">Frontend Prototype Simulator</span>
+      </div>
+
+      <div class="row g-3" id="roles-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Standard Login Form -->
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="hms-card p-4">
+          <h5 class="fw-bold text-hms-navy mb-3 text-center">ইউজারনেম ও পাসওয়ার্ড লগইন</h5>
+          <form onsubmit="handleManualLogin(event)">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">ইউজারনেম / ইমেইল</label>
+              <input type="text" class="form-control" id="login-username" value="admin" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">পাসওয়ার্ড</label>
+              <input type="password" class="form-control" id="login-password" value="password123" required>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3 small">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberMe" checked>
+                <label class="form-check-label" for="rememberMe">মনে রাখুন</label>
+              </div>
+              <a href="#" class="text-primary text-decoration-none" onclick="alert('ডেমো সংস্করণে যেকোনো পাসওয়ার্ড কার্যকর। ডিফল্ট: password123')">পাসওয়ার্ড ভুলে গেছেন?</a>
+            </div>
+            <button type="submit" class="btn btn-hms-primary w-100 mb-3">লগইন করুন</button>
+            <div class="text-center small text-muted">
+              নতুন রোগী? <a href="register.html" class="text-primary fw-semibold">এখানে নিবন্ধন করুন</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>পাবলিক ওয়েবসাইটে ফিরে যান
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderRoleCards();
+    });
+
+    function renderRoleCards() {
+      const isEn = HMS.I18n.currentLang === 'en';
+      const container = document.getElementById('roles-grid');
+      container.innerHTML = HMS.CONFIG.ROLES.map(r => `
+        <div class="col-xl-3 col-lg-4 col-sm-6">
+          <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between role-select-card" style="cursor:pointer; transition:0.2s;" onclick="quickLogin('${r.id}')" onmouseover="this.classList.add('shadow-sm', 'border-primary')" onmouseout="this.classList.remove('shadow-sm', 'border-primary')">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="stat-icon ${r.id === 'patient' ? 'green' : 'blue'}" style="width:38px; height:38px; font-size:1.1rem;">
+                  <i class="bi ${r.icon}"></i>
+                </div>
+                <div>
+                  <h6 class="mb-0 fw-bold text-hms-navy">${isEn ? r.name_en : r.name_bn}</h6>
+                  <span class="badge ${r.id === 'patient' ? 'bg-success' : 'bg-secondary'}" style="font-size:0.65rem;">${r.id}</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-primary w-100 mt-2 py-1" style="font-size:0.8rem;">
+              লগইন করুন <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function quickLogin(roleId) {
+      HMS.Auth.loginAs(roleId);
+      HMS.UI.showToast(`লগইন সফল: ${roleId}`, 'success');
+      setTimeout(() => {
+        if (roleId === 'patient') {
+          window.location.href = 'patient/index.html';
+        } else {
+          window.location.href = 'admin/index.html';
+        }
+      }, 500);
+    }
+
+    function handleManualLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const users = HMS.Storage.getCollection('users');
+      const user = users.find(u => u.username === username || u.role === username) || users[0];
+      quickLogin(user.role);
+    }
+  </script>
+</body>
+</html>

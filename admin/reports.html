@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>রিপোর্টস ও অ্যানালিটিক্স (Reports & Analytics) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-bar-chart-line-fill text-primary me-2"></i>রিপোর্টস ও অ্যানালিটিক্স (Reports & Analytics)</h4>
+            <p class="text-muted small mb-0">ক্লিনিকাল, আর্থিক, ল্যাবরেটরি ও অপারেশনাল ডাটা ফিল্টারিং ও এক্সপোর্ট</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('report-result-table', 'carepoint_analytics_report.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="window.print()">
+              <i class="bi bi-printer me-1"></i>রিপোর্ট প্রিন্ট
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Panel -->
+        <div class="hms-card p-3 mb-4 bg-white">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">রিপোর্টের ধরন</label>
+              <select class="form-select" id="rep-type" onchange="generateReport()">
+                <option value="financial">আর্থিক রাজস্ব ও কালেকশন রিপোর্ট (Financial)</option>
+                <option value="patients">রোগী নিবন্ধন ও ডেমোগ্রাফিক রিপোর্ট (Patients)</option>
+                <option value="appointments">অ্যাপয়েন্টমেন্ট ও কনসালটেশন রিপোর্ট (Appointments)</option>
+                <option value="admissions">ইনপেশেন্ট ভর্তি ও শয্যা রিপোর্ট (IPD)</option>
+                <option value="lab">ল্যাবরেটরি ও প্যাথলজি রিপোর্ট (LIS)</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">শুরুর তারিখ</label>
+              <input type="date" class="form-control" id="rep-start-date" value="2026-11-01" onchange="generateReport()">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-semibold text-muted mb-1">শেষ তারিখ</label>
+              <input type="date" class="form-control" id="rep-end-date" value="2026-11-06" onchange="generateReport()">
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-hms-primary w-100" onclick="generateReport()">
+                <i class="bi bi-funnel me-1"></i>রিপোর্ট তৈরি করুন
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report Results Card -->
+        <div class="hms-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <div>
+              <h5 class="fw-bold text-hms-navy mb-0" id="report-title">আর্থিক রাজস্ব ও কালেকশন রিপোর্ট</h5>
+              <small class="text-muted" id="report-period">সময়কাল: ০১ নভেম্বর ২০২৬ থেকে ০৬ নভেম্বর ২০২৬</small>
+            </div>
+            <span class="badge bg-success" id="report-summary-badge">মোট রেকর্ড: ০</span>
+          </div>
+
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="report-result-table">
+              <thead id="report-thead">
+                <!-- Injected by JS -->
+              </thead>
+              <tbody id="report-tbody">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('reports');
+      HMS.UI.renderAdminTopbar('রিপোর্ট ও অ্যানালিটিক্স', [{ title: 'অ্যানালিটিক্স', url: '#' }, { title: 'রিপোর্ট', url: '#' }]);
+      generateReport();
+    });
+
+    function generateReport() {
+      const type = document.getElementById('rep-type').value;
+      const thead = document.getElementById('report-thead');
+      const tbody = document.getElementById('report-tbody');
+      const titleEl = document.getElementById('report-title');
+      const badgeEl = document.getElementById('report-summary-badge');
+
+      if (type === 'financial') {
+        titleEl.textContent = 'আর্থিক রাজস্ব ও কালেকশন রিপোর্ট (Financial Revenue)';
+        thead.innerHTML = `
+          <tr>
+            <th>ইনভয়েস নং</th>
+            <th>তারিখ</th>
+            <th>রোগীর নাম</th>
+            <th>মোট টাকা</th>
+            <th>পরিশোধিত টাকা</th>
+            <th>বকেয়া</th>
+            <th>পদ্ধতি</th>
+            <th>অবস্থা</th>
+          </tr>
+        `;
+        const invoices = HMS.Storage.getCollection('invoices');
+        badgeEl.textContent = `মোট ইনভয়েস: ${invoices.length} টি`;
+        tbody.innerHTML = invoices.map(i => `
+          <tr>
+            <td><strong>${i.invoice_no}</strong></td>
+            <td>${i.date}</td>
+            <td>${i.patient_name} (${i.uhid})</td>
+            <td><strong>${HMS.I18n.formatCurrency(i.total)}</strong></td>
+            <td class="text-success">${HMS.I18n.formatCurrency(i.paid_amount)}</td>
+            <td class="${i.due_amount > 0 ? 'text-danger fw-bold' : 'text-muted'}">${HMS.I18n.formatCurrency(i.due_amount)}</td>
+            <td><small>${i.payment_method}</small></td>
+            <td><span class="badge ${i.status === 'Paid' ? 'bg-success' : 'bg-warning'}">${i.status}</span></td>
+          </tr>
+        `).join('');
+      } else if (type === 'patients') {
+        titleEl.textContent = 'রোগী নিবন্ধন ও পরিসংখ্যান রিপোর্ট (Patients)';
+        thead.innerHTML = `
+          <tr>
+            <th>UHID</th>
+            <th>নাম</th>
+            <th>বয়স ও লিঙ্গ</th>
+            <th>রক্তের গ্রুপ</th>
+            <th>মোবাইল</th>
+            <th>নিবন্ধনের তারিখ</th>
+            <th>অবস্থা</th>
+          </tr>
+        `;
+        const patients = HMS.Storage.getCollection('patients');
+        badgeEl.textContent = `মোট রোগী: ${patients.length} জন`;
+        tbody.innerHTML = patients.map(p => `
+          <tr>
+            <td><span class="badge bg-primary">${p.uhid}</span></td>
+            <td><strong>${p.name_bn || p.name_en}</strong></td>
+            <td>${p.age} Y / ${p.gender}</td>
+            <td><strong class="text-danger">${p.blood_group}</strong></td>
+            <td>${p.phone}</td>
+            <td>${p.registered_date}</td>
+            <td><span class="badge bg-success">${p.status}</span></td>
+          </tr>
+        `).join('');
+      } else if (type === 'appointments') {
+        titleEl.textContent = 'অ্যাপয়েন্টমেন্ট ও কনসালটেশন রিপোর্ট (Appointments)';
+        thead.innerHTML = `
+          <tr>
+            <th>টোকেন</th>
+            <th>অ্যাপয়েন্টমেন্ট নং</th>
+            <th>রোগী</th>
+            <th>চিকিৎসক</th>
+            <th>তারিখ ও সময়</th>
+            <th>ফি</th>
+            <th>অবস্থা</th>
+          </tr>
+        `;
+        const apts = HMS.Storage.getCollection('appointments');
+        badgeEl.textContent = `মোট সিরিয়াল: ${apts.length} টি`;
+        tbody.innerHTML = apts.map(a => `
+          <tr>
+            <td><span class="badge bg-primary">#${a.token_no}</span></td>
+            <td><strong>${a.appointment_no}</strong></td>
+            <td>${a.patient_name}</td>
+            <td>${a.doctor_name}</td>
+            <td>${a.date} ${a.time_slot}</td>
+            <td>${HMS.I18n.formatCurrency(a.fee)}</td>
+            <td><span class="badge bg-info">${a.status}</span></td>
+          </tr>
+        `).join('');
+      } else if (type === 'admissions') {
+        titleEl.textContent = 'ইনপেশেন্ট ভর্তি ও শয্যা ব্যবহার রিপোর্ট (IPD)';
+        thead.innerHTML = `
+          <tr>
+            <th>ভর্তি নং</th>
+            <th>রোগীর নাম</th>
+            <th>শয্যা / ওয়ার্ড</th>
+            <th>ভর্তি তারিখ</th>
+            <th>তত্ত্বাবধায়ক চিকিৎসক</th>
+            <th>অবস্থা</th>
+          </tr>
+        `;
+        const adms = HMS.Storage.getCollection('admissions');
+        badgeEl.textContent = `মোট ভর্তি: ${adms.length} জন`;
+        tbody.innerHTML = adms.map(adm => `
+          <tr>
+            <td><strong>${adm.admission_no}</strong></td>
+            <td>${adm.patient_name} (${adm.uhid})</td>
+            <td>${adm.bed_number} (${adm.ward_name})</td>
+            <td>${adm.admission_date}</td>
+            <td>${adm.attending_doctor}</td>
+            <td><span class="badge ${adm.status === 'Admitted' ? 'bg-danger' : 'bg-success'}">${adm.status}</span></td>
+          </tr>
+        `).join('');
+      } else if (type === 'lab') {
+        titleEl.textContent = 'ল্যাবরেটরি ও প্যাথলজি টেস্ট রিপোর্ট (LIS)';
+        thead.innerHTML = `
+          <tr>
+            <th>অর্ডার নং</th>
+            <th>স্যাম্পল আইডি</th>
+            <th>রোগী</th>
+            <th>পরীক্ষাসমূহ</th>
+            <th>তারিখ</th>
+            <th>বিল</th>
+            <th>অবস্থা</th>
+          </tr>
+        `;
+        const labs = HMS.Storage.getCollection('lab_orders');
+        badgeEl.textContent = `মোট টেস্ট অর্ডার: ${labs.length} টি`;
+        tbody.innerHTML = labs.map(l => `
+          <tr>
+            <td><strong>${l.order_no}</strong></td>
+            <td><code>${l.sample_id}</code></td>
+            <td>${l.patient_name}</td>
+            <td>${l.tests.join(', ')}</td>
+            <td>${l.order_date}</td>
+            <td>${HMS.I18n.formatCurrency(l.total_bill)}</td>
+            <td><span class="badge bg-success">${l.status}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+  </script>
+</body>
+</html>

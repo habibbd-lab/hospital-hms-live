@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>স্বাস্থ্য কথিকা ও ব্লগ (Health Library) | কেয়ারপয়েন্ট হাসপাতাল</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+  <div id="public-topbar-placeholder"></div>
+  <div id="public-navbar-placeholder"></div>
+
+  <div class="bg-hms-navy text-white py-5">
+    <div class="container text-center">
+      <h1 class="fw-bold mb-2">স্বাস্থ্য তথ্যভাণ্ডার ও বিশেষজ্ঞ পরামর্শ</h1>
+      <p class="text-light opacity-75 mb-0">দৈনন্দিন জীবনে সুস্থতা ও রোগ প্রতিরোধে সহায়ক তথ্য ও আর্টিকেল</p>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <div class="row g-4" id="articles-list-container">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <div id="public-footer-placeholder"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/website.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.Website.initNavbarAndFooter('health-library');
+      renderArticles();
+    });
+
+    function renderArticles() {
+      const articles = HMS.SEED_DATA.cms.news_and_articles;
+      const container = document.getElementById('articles-list-container');
+      container.innerHTML = articles.map(art => `
+        <div class="col-lg-4 col-md-6">
+          <div class="hms-card h-100 p-4">
+            <span class="badge bg-primary mb-3 align-self-start">${art.category}</span>
+            <h4 class="fw-bold text-hms-navy mb-2">${art.title_bn}</h4>
+            <p class="text-muted small">${art.excerpt_bn}</p>
+            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center text-muted small">
+              <span><i class="bi bi-person-circle me-1"></i>${art.author}</span>
+              <span><i class="bi bi-calendar3 me-1"></i>${art.date}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

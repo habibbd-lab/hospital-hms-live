@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>চিকিৎসক ব্যবস্থাপনা (Doctor Management) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">চিকিৎসক ডিরেক্টরি ও শিডিউল (Doctor Management)</h4>
+            <p class="text-muted small mb-0">কনসালট্যান্ট প্রোফাইল, চেম্বার সময়সূচি, ফি ও শিফট রোস্টার</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('doctors-table', 'carepoint_doctors.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewDoctorModal()">
+              <i class="bi bi-plus-circle me-1"></i>নতুন চিকিৎসক যোগ করুন
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="hms-card p-3 mb-4 bg-white">
+          <div class="row g-3">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control" id="doc-search" placeholder="ডাক্তারের নাম বা ডিগ্রি..." oninput="filterDoctors()">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select class="form-select" id="doc-dept-filter" onchange="filterDoctors()">
+                <option value="">সকল বিভাগ (All Departments)</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="doc-status-filter" onchange="filterDoctors()">
+                <option value="">সকল অবস্থা</option>
+                <option value="Available">উপলব্ধ (Available)</option>
+                <option value="On Leave">ছুটিতে আছেন (On Leave)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctors Table -->
+        <div class="hms-card">
+          <div class="hms-table-responsive">
+            <table class="hms-table" id="doctors-table">
+              <thead>
+                <tr>
+                  <th>ডাক্তার আইডি</th>
+                  <th>নাম ও ডিগ্রি</th>
+                  <th>বিভাগ</th>
+                  <th>রুম নং</th>
+                  <th>পরামর্শ ফি</th>
+                  <th>চেম্বার শিডিউল</th>
+                  <th>উপলব্ধতা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="doctors-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- New Doctor Modal -->
+  <div class="modal fade" id="newDoctorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy"><i class="bi bi-heart-pulse text-primary me-2"></i>চিকিৎসক নিবন্ধন</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="saveDoctor(event)">
+          <div class="modal-body p-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">নাম (বাংলা) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-name-bn" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">নাম (English) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-name-en" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">বিভাগ (Department) <span class="text-danger">*</span></label>
+                <select class="form-select" id="d-dept" required></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">পদবী (Designation) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-designation" placeholder="উদাঃ সহযোগী অধ্যাপক" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">শিক্ষাগত ডিগ্রি <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-degrees" placeholder="MBBS, FCPS, MD" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">পরামর্শ ফি (৳) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="d-fee" value="1200" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">চেম্বার রুম নং <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-room" placeholder="৩০৫" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">চেম্বার শিডিউল <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="d-schedule" placeholder="শনি - বুধ (বিকাল ৫:০০ - রাত ৮:০০)" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">মোবাইল নম্বর</label>
+                <input type="tel" class="form-control" id="d-phone" placeholder="017xxxxxxxx">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-hms-primary">সংরক্ষণ করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let doctorsList = [];
+    let newDocModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('doctors');
+      HMS.UI.renderAdminTopbar('চিকিৎসক ব্যবস্থাপনা', [{ title: 'মেডিকেল স্টাফ', url: '#' }, { title: 'ডাক্তার ডিরেক্টরি', url: '#' }]);
+      loadDoctors();
+    });
+
+    function loadDoctors() {
+      doctorsList = HMS.Storage.getCollection('doctors');
+      const depts = HMS.Storage.getCollection('departments');
+      
+      const deptFilter = document.getElementById('doc-dept-filter');
+      deptFilter.innerHTML = '<option value="">সকল বিভাগ (All Departments)</option>' + 
+        depts.map(d => `<option value="${d.id}">${d.name_bn}</option>`).join('');
+
+      const modalDept = document.getElementById('d-dept');
+      modalDept.innerHTML = depts.map(d => `<option value="${d.id}" data-name="${d.name_bn}">${d.name_bn}</option>`).join('');
+
+      filterDoctors();
+    }
+
+    function filterDoctors() {
+      const q = document.getElementById('doc-search').value.toLowerCase().trim();
+      const dept = document.getElementById('doc-dept-filter').value;
+      const status = document.getElementById('doc-status-filter').value;
+
+      const filtered = doctorsList.filter(d => {
+        const matchesQuery = !q || d.name_bn.toLowerCase().includes(q) || d.name_en.toLowerCase().includes(q) || d.degrees.toLowerCase().includes(q);
+        const matchesDept = !dept || d.dept_id === dept;
+        const matchesStatus = !status || d.status === status;
+        return matchesQuery && matchesDept && matchesStatus;
+      });
+
+      renderDoctorsTable(filtered);
+    }
+
+    function renderDoctorsTable(list) {
+      const tbody = document.getElementById('doctors-table-body');
+      tbody.innerHTML = list.map(d => `
+        <tr>
+          <td><span class="badge bg-secondary">${d.id}</span></td>
+          <td>
+            <div class="fw-bold text-hms-navy">${d.name_bn}</div>
+            <small class="text-primary">${d.degrees}</small>
+          </td>
+          <td><small class="fw-semibold">${d.dept_name}</small></td>
+          <td>${d.room}</td>
+          <td><span class="fw-bold text-success">${HMS.I18n.formatCurrency(d.fee)}</span></td>
+          <td><small class="text-muted">${d.schedule}</small></td>
+          <td>
+            <button class="btn btn-sm ${d.status === 'Available' ? 'btn-outline-success' : 'btn-outline-warning'} py-0 px-2" onclick="toggleDoctorStatus('${d.id}')">
+              ${d.status === 'Available' ? '<i class="bi bi-check-circle me-1"></i>উপলব্ধ' : '<i class="bi bi-clock me-1"></i>ছুটিতে'}
+            </button>
+          </td>
+          <td class="text-end no-export">
+            <div class="btn-group btn-group-sm">
+              <a href="appointments.html?doc=${d.id}" class="btn btn-outline-primary" title="অ্যাপয়েন্টমেন্ট কিউ"><i class="bi bi-calendar-check"></i></a>
+              <button class="btn btn-outline-danger" onclick="deleteDoctor('${d.id}')" title="মুছুন"><i class="bi bi-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleDoctorStatus(id) {
+      const doc = HMS.Storage.getById('doctors', id);
+      if (!doc) return;
+      const newStatus = doc.status === 'Available' ? 'On Leave' : 'Available';
+      HMS.Storage.update('doctors', id, { status: newStatus });
+      HMS.UI.showToast(`ডাক্তার ${doc.name_bn} এর অবস্থা আপডেট হয়েছে: ${newStatus}`, 'success');
+      loadDoctors();
+    }
+
+    function openNewDoctorModal() {
+      newDocModalInstance = new bootstrap.Modal(document.getElementById('newDoctorModal'));
+      newDocModalInstance.show();
+    }
+
+    function saveDoctor(e) {
+      e.preventDefault();
+      const deptSelect = document.getElementById('d-dept');
+      const deptName = deptSelect.options[deptSelect.selectedIndex].getAttribute('data-name');
+      const newDoc = {
+        id: `DOC-${String(doctorsList.length + 1).padStart(2, '0')}`,
+        name_bn: document.getElementById('d-name-bn').value,
+        name_en: document.getElementById('d-name-en').value,
+        dept_id: deptSelect.value,
+        dept_name: deptName,
+        designation: document.getElementById('d-designation').value,
+        degrees: document.getElementById('d-degrees').value,
+        fee: Number(document.getElementById('d-fee').value),
+        room: document.getElementById('d-room').value,
+        schedule: document.getElementById('d-schedule').value,
+        phone: document.getElementById('d-phone').value || '+880 1711-000000',
+        experience: '১০+ বছর',
+        rating: 4.8,
+        status: 'Available',
+        bio: 'অভিজ্ঞ বিশেষজ্ঞ চিকিৎসক।'
+      };
+      HMS.Storage.insert('doctors', newDoc);
+      newDocModalInstance.hide();
+      HMS.UI.showToast('নতুন চিকিৎসক সফলভাবে যুক্ত করা হয়েছে!', 'success');
+      loadDoctors();
+      e.target.reset();
+    }
+
+    function deleteDoctor(id) {
+      if (confirm('আপনি কি এই চিকিৎসকের রেকর্ড মুছে ফেলতে চান?')) {
+        HMS.Storage.delete('doctors', id);
+        HMS.UI.showToast('চিকিৎসক রেকর্ড সফলভাবে মুছে ফেলা হয়েছে!', 'success');
+        loadDoctors();
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>মেডিকেল রেকর্ডস বিভাগ (MRD Archive) | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-file-earmark-medical-fill text-primary me-2"></i>মেডিকেল রেকর্ডস ও ডিজিটাল আর্কাইভ (MRD)</h4>
+            <p class="text-muted small mb-0">রোগীদের স্থায়ী ডিজিটাল ফাইল সংরক্ষণ, ক্লিনিকাল হিস্ট্রি ও এক্সেস অডিট লগ</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-hms-primary btn-sm" onclick="uploadDocDemo()">
+              <i class="bi bi-cloud-arrow-up me-1"></i>নতুন ক্লিনিকাল ডকুমেন্ট আর্কাইভ করুন
+            </button>
+          </div>
+        </div>
+
+        <!-- MRD Files List -->
+        <div class="hms-card mb-4">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">সংরক্ষিত ডিজিটাল মেডিকেল ডসিয়ার ও ফাইল</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>ফাইল আইডি</th>
+                  <th>রোগীর নাম ও UHID</th>
+                  <th>নথিপত্রের ধরন</th>
+                  <th>বিভাগ ও কনসালট্যান্ট</th>
+                  <th>আর্কাইভের তারিখ</th>
+                  <th>সিকিউরিটি লেভেল</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge bg-secondary">MRD-F-001</span></td>
+                  <td><strong>মো. রফিকুল ইসলাম</strong><br><small class="text-primary">CPH-2026-0001</small></td>
+                  <td>কার্ডিয়াক ইসিজি ও ইকোকার্ডিওগ্রাম রিপোর্ট</td>
+                  <td>কার্ডিওলজি (অধ্যাপক ডা. মিজানুর রহমান)</td>
+                  <td>২০২৬-১১-০৫</td>
+                  <td><span class="badge bg-info text-dark">Confidential Level 2</span></td>
+                  <td class="text-end no-export"><button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="HMS.UI.showToast('ডকুমেন্ট ভিউয়ার উন্মুক্ত হচ্ছে...', 'info')">ফাইল দেখুন</button></td>
+                </tr>
+                <tr>
+                  <td><span class="badge bg-secondary">MRD-F-002</span></td>
+                  <td><strong>কাজী আনোয়ার হোসেন</strong><br><small class="text-primary">CPH-2026-0003</small></td>
+                  <td>করোনারি ক্যাথল্যাব এনজিওগ্রাম ফাইল</td>
+                  <td>কার্ডিয়াক ওটি / সিসিইউ</td>
+                  <td>২০২৬-১১-০৪</td>
+                  <td><span class="badge bg-danger">Restricted Clinical</span></td>
+                  <td class="text-end no-export"><button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="HMS.UI.showToast('ডকুমেন্ট ভিউয়ার উন্মুক্ত হচ্ছে...', 'info')">ফাইল দেখুন</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Audit Access Log -->
+        <div class="hms-card p-4">
+          <h6 class="fw-bold text-hms-navy mb-3"><i class="bi bi-shield-lock text-warning me-2"></i>মেডিকেল রেকর্ড এক্সেস অডিট লগ (Compliance & Privacy Audit)</h6>
+          <div class="p-3 bg-light rounded-3 font-monospace small">
+            <div>[2026-11-05 14:10:22] Dr. Mizanur Rahman viewed CPH-2026-0001 (ECG Archive) - IP: 192.168.1.45</div>
+            <div>[2026-11-05 11:35:10] Kabir Hossain (Lab Tech) uploaded blood test results for CPH-2026-0001</div>
+            <div>[2026-11-04 18:45:00] Admin accessed Admission Record for CPH-2026-0003</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('medical-records');
+      HMS.UI.renderAdminTopbar('মেডিকেল রেকর্ডস (MRD)', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'আর্কাইভ', url: '#' }]);
+    });
+
+    function uploadDocDemo() {
+      const p = prompt('রোগীর UHID লিখুন:', 'CPH-2026-0001');
+      if (p) {
+        HMS.UI.showToast(`ক্লিনিকাল ফাইল সফলভাবে এনক্রিপ্ট ও MRD আর্কাইভে সংরক্ষিত হয়েছে!`, 'success');
+      }
+    }
+  </script>
+</body>
+</html>

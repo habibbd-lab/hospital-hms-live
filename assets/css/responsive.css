@@ -1,0 +1,85 @@
+/**
+ * Hospital Management System (HMS) - Responsive Overrides
+ * Mobile, Tablet, Laptop & Desktop Optimizations
+ */
+
+/* Desktop & Large Screens (min-width: 992px) */
+@media (min-width: 992px) {
+  .sidebar-toggle-btn {
+    display: none !important;
+  }
+}
+
+/* Tablet & Mobile Screens (max-width: 991.98px) */
+@media (max-width: 991.98px) {
+  .hms-sidebar {
+    left: calc(-1 * var(--hms-sidebar-width));
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  body.sidebar-open .hms-sidebar {
+    left: 0;
+  }
+  
+  /* Backdrop when mobile sidebar is open */
+  body.sidebar-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(18, 48, 74, 0.5);
+    z-index: 1035;
+    backdrop-filter: blur(2px);
+  }
+  
+  .hms-main-content {
+    margin-left: 0 !important;
+  }
+  
+  .hms-topbar {
+    padding: 0 1rem;
+  }
+  
+  .dashboard-content {
+    padding: 1rem;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .stats-counter-bar {
+    margin-top: 1.5rem;
+  }
+  
+  .prescription-paper, .invoice-paper {
+    padding: 1.25rem;
+  }
+}
+
+/* Mobile Screens (max-width: 576px) */
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: 1.65rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .stat-card-value {
+    font-size: 1.35rem;
+  }
+  
+  .bed-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hms-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

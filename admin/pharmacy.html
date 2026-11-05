@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ফার্মেসি ব্যবস্থাপনা ও পিওএস কাউন্টার | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1">ফার্মেসি ও বিক্রয় কাউন্টার (Pharmacy & POS)</h4>
+            <p class="text-muted small mb-0">ঔষধের ইনভেন্টরি, ব্যাচ ট্র্যাকিং, এক্সপায়ারি অ্যালার্ট ও সরাসরি বিক্রয়</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMS.UI.exportTableToCSV('medicines-table', 'carepoint_medicines.csv')">
+              <i class="bi bi-download me-1"></i>CSV এক্সপোর্ট
+            </button>
+            <button class="btn btn-hms-primary btn-sm" onclick="openNewMedicineModal()">
+              <i class="bi bi-plus-circle me-1"></i>নতুন ঔষধ স্টক যোগ করুন
+            </button>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Left Column: Medicine Inventory List -->
+          <div class="col-lg-7">
+            <div class="hms-card h-100">
+              <div class="hms-card-header">
+                <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-capsule text-primary me-2"></i>বিদ্যমান ঔষধ তালিকা ও স্টক</h6>
+                <input type="text" class="form-control form-control-sm" style="width:200px;" id="med-search" placeholder="ব্র্যান্ড বা জেনেরিক নাম..." oninput="filterMedicines()">
+              </div>
+              <div class="hms-table-responsive">
+                <table class="hms-table" id="medicines-table">
+                  <thead>
+                    <tr>
+                      <th>ব্র্যান্ড নাম</th>
+                      <th>জেনেরিক ও কোম্পানি</th>
+                      <th>ব্যাচ</th>
+                      <th>বর্তমান স্টক</th>
+                      <th>মূল্য (৳)</th>
+                      <th>মেয়াদ</th>
+                      <th class="no-export">অ্যাকশন</th>
+                    </tr>
+                  </thead>
+                  <tbody id="medicines-table-body">
+                    <!-- Rendered by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Fast POS Billing Counter -->
+          <div class="col-lg-5">
+            <div class="hms-card p-4">
+              <h5 class="fw-bold text-hms-navy mb-3 pb-2 border-bottom">
+                <i class="bi bi-cart-check text-success me-2"></i>ফার্মেসি পিওএস বিলিং (POS Counter)
+              </h5>
+              <form id="pos-form" onsubmit="handlePosSale(event)">
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">রোগী / গ্রাহক তথ্য</label>
+                  <div class="row g-2">
+                    <div class="col-7">
+                      <input type="text" class="form-control form-control-sm" id="pos-patient-name" placeholder="গ্রাহকের নাম" value="মো. রফিকুল ইসলাম" required>
+                    </div>
+                    <div class="col-5">
+                      <input type="text" class="form-control form-control-sm" id="pos-patient-uhid" placeholder="UHID" value="CPH-2026-0001">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Medicine Selector & Add Button -->
+                <div class="p-3 bg-light rounded-3 mb-3 border">
+                  <label class="form-label small fw-semibold">ঔষধ নির্বাচন করুন</label>
+                  <select class="form-select form-select-sm mb-2" id="pos-med-select" onchange="updatePosUnitPrice()"></select>
+                  <div class="row g-2 align-items-center">
+                    <div class="col-6">
+                      <label class="form-label small text-muted" style="font-size:0.75rem;">পরিমাণ (Quantity)</label>
+                      <input type="number" class="form-control form-control-sm" id="pos-qty" value="10" min="1">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small text-muted" style="font-size:0.75rem;">একক মূল্য: <span id="pos-rate-display">৳০</span></label>
+                      <button type="button" class="btn btn-sm btn-outline-primary w-100" onclick="addItemToPosCart()">
+                        <i class="bi bi-plus-lg me-1"></i>কার্টে যোগ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- POS Cart Table -->
+                <div class="table-responsive mb-3 border rounded">
+                  <table class="table table-sm small mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>ঔষধ</th>
+                        <th>পরিমাণ</th>
+                        <th>দর</th>
+                        <th>মোট</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="pos-cart-body">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Summary & Payment -->
+                <div class="p-3 bg-light rounded-3 mb-3">
+                  <div class="d-flex justify-content-between mb-1 small">
+                    <span>সাবটোটাল:</span>
+                    <strong id="pos-subtotal">৳০</strong>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1 small text-muted">
+                    <span>ভ্যাট (ডেমো ৫%):</span>
+                    <span id="pos-vat">৳০</span>
+                  </div>
+                  <div class="d-flex justify-content-between pt-2 border-top fs-5 fw-bold text-hms-navy">
+                    <span>সর্বমোট মূল্য:</span>
+                    <span class="text-success" id="pos-grand-total">৳০</span>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">পেমেন্ট মাধ্যম</label>
+                  <select class="form-select form-select-sm" id="pos-payment-method">
+                    <option value="Cash (POS Counter)">ক্যাশ (Cash Counter)</option>
+                    <option value="bKash (POS Digital)">বিকাশ (bKash Digital)</option>
+                    <option value="Nagad">নগদ (Nagad)</option>
+                    <option value="Debit Card">ডেবিট / ক্রেডিট কার্ড</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-hms-success w-100 btn-lg">
+                  <i class="bi bi-receipt me-1"></i>বিক্রয় সম্পন্ন ও ইনভয়েস তৈরি
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- New Medicine Modal -->
+  <div class="modal fade" id="newMedicineModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy">নতুন ঔষধ স্টক সংযোজন</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleNewMedicine(event)">
+          <div class="modal-body p-4">
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">ব্র্যান্ডের নাম</label>
+              <input type="text" class="form-control" id="nm-brand" placeholder="উদাঃ Napa 500" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small fw-semibold">জেনেরিক নাম</label>
+              <input type="text" class="form-control" id="nm-generic" placeholder="Paracetamol" required>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small fw-semibold">ব্যাচ নম্বর</label>
+                <input type="text" class="form-control" id="nm-batch" placeholder="NP-2026" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold">স্টক পরিমাণ</label>
+                <input type="number" class="form-control" id="nm-stock" value="500" required>
+              </div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small fw-semibold">খুচরা বিক্রয় মূল্য (৳)</label>
+                <input type="number" step="0.5" class="form-control" id="nm-price" value="3.5" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold">মেয়াদোত্তীর্ণ তারিখ</label>
+                <input type="date" class="form-control" id="nm-expiry" required>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">বাতিল</button>
+            <button type="submit" class="btn btn-hms-primary">স্টকে যোগ করুন</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let medicinesList = [];
+    let posCart = [];
+    let newMedModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('pharmacy');
+      HMS.UI.renderAdminTopbar('ফার্মেসি ব্যবস্থাপনা', [{ title: 'ক্লিনিকাল', url: '#' }, { title: 'ফার্মেসি', url: '#' }]);
+      loadPharmacyData();
+      initDefaultPosCart();
+    });
+
+    function loadPharmacyData() {
+      medicinesList = HMS.Storage.getCollection('medicines');
+      
+      const posSelect = document.getElementById('pos-med-select');
+      posSelect.innerHTML = medicinesList.map(m => `
+        <option value="${m.id}" data-rate="${m.unit_price}" data-brand="${m.brand}" data-generic="${m.generic}" data-stock="${m.stock}">
+          ${m.brand} (${m.form}) - স্টক: ${m.stock} [${HMS.I18n.formatCurrency(m.unit_price)}]
+        </option>
+      `).join('');
+      updatePosUnitPrice();
+
+      filterMedicines();
+    }
+
+    function filterMedicines() {
+      const q = document.getElementById('med-search').value.toLowerCase().trim();
+      const filtered = medicinesList.filter(m => 
+        !q || m.brand.toLowerCase().includes(q) || m.generic.toLowerCase().includes(q) || m.company.toLowerCase().includes(q)
+      );
+      renderMedicinesTable(filtered);
+    }
+
+    function renderMedicinesTable(list) {
+      const tbody = document.getElementById('medicines-table-body');
+      tbody.innerHTML = list.map(m => `
+        <tr>
+          <td><strong class="text-hms-navy">${m.brand}</strong><br><small class="text-muted">${m.form}</small></td>
+          <td><small class="text-primary">${m.generic}</small><br><small class="text-muted">${m.company}</small></td>
+          <td><span class="badge bg-light text-dark border">${m.batch}</span></td>
+          <td>
+            <strong class="${m.stock <= m.reorder_level ? 'text-danger' : 'text-success'}">${m.stock}</strong>
+            ${m.stock <= m.reorder_level ? '<span class="badge bg-danger ms-1" style="font-size:0.65rem;">Low</span>' : ''}
+          </td>
+          <td>${HMS.I18n.formatCurrency(m.unit_price)}</td>
+          <td><small class="text-muted">${m.expiry}</small></td>
+          <td class="no-export">
+            <button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="addDirectToCart('${m.id}')" title="কার্টে নিন">
+              <i class="bi bi-cart-plus"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updatePosUnitPrice() {
+      const sel = document.getElementById('pos-med-select');
+      if (sel.selectedIndex !== -1) {
+        const rate = sel.options[sel.selectedIndex].getAttribute('data-rate');
+        document.getElementById('pos-rate-display').textContent = HMS.I18n.formatCurrency(rate);
+      }
+    }
+
+    function addDirectToCart(medId) {
+      const med = HMS.Storage.getById('medicines', medId);
+      if (med) {
+        const existing = posCart.find(i => i.medicine_id === med.id);
+        if (existing) {
+          existing.qty += 5;
+        } else {
+          posCart.push({
+            medicine_id: med.id,
+            brand: med.brand,
+            generic: med.generic,
+            unit_price: med.unit_price,
+            qty: 5
+          });
+        }
+        renderPosCart();
+      }
+    }
+
+    function addItemToPosCart() {
+      const sel = document.getElementById('pos-med-select');
+      const opt = sel.options[sel.selectedIndex];
+      const medId = sel.value;
+      const brand = opt.getAttribute('data-brand');
+      const generic = opt.getAttribute('data-generic');
+      const rate = Number(opt.getAttribute('data-rate'));
+      const stock = Number(opt.getAttribute('data-stock'));
+      const qty = Number(document.getElementById('pos-qty').value) || 1;
+
+      if (qty > stock) {
+        alert(`পর্যাপ্ত স্টক নেই। সর্বোচ্চ স্টক: ${stock}`);
+        return;
+      }
+
+      const existing = posCart.find(i => i.medicine_id === medId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        posCart.push({
+          medicine_id: medId,
+          brand: brand,
+          generic: generic,
+          unit_price: rate,
+          qty: qty
+        });
+      }
+      renderPosCart();
+    }
+
+    function initDefaultPosCart() {
+      const m1 = medicinesList[0];
+      const m2 = medicinesList[1];
+      if (m1 && m2) {
+        posCart = [
+          { medicine_id: m1.id, brand: m1.brand, generic: m1.generic, unit_price: m1.unit_price, qty: 10 },
+          { medicine_id: m2.id, brand: m2.brand, generic: m2.generic, unit_price: m2.unit_price, qty: 5 }
+        ];
+        renderPosCart();
+      }
+    }
+
+    function renderPosCart() {
+      const tbody = document.getElementById('pos-cart-body');
+      let subtotal = 0;
+
+      if (posCart.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">কার্ট খালি আছে।</td></tr>`;
+      } else {
+        tbody.innerHTML = posCart.map((item, idx) => {
+          const itemTotal = item.qty * item.unit_price;
+          subtotal += itemTotal;
+          return `
+            <tr>
+              <td><strong>${item.brand}</strong></td>
+              <td>${item.qty}</td>
+              <td>${HMS.I18n.formatCurrency(item.unit_price)}</td>
+              <td>${HMS.I18n.formatCurrency(itemTotal)}</td>
+              <td class="text-end">
+                <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removePosCartItem(${idx})"><i class="bi bi-x-circle"></i></button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const vat = subtotal * 0.05;
+      const grandTotal = subtotal + vat;
+
+      document.getElementById('pos-subtotal').textContent = HMS.I18n.formatCurrency(subtotal);
+      document.getElementById('pos-vat').textContent = HMS.I18n.formatCurrency(vat);
+      document.getElementById('pos-grand-total').textContent = HMS.I18n.formatCurrency(grandTotal);
+    }
+
+    function removePosCartItem(idx) {
+      posCart.splice(idx, 1);
+      renderPosCart();
+    }
+
+    function handlePosSale(e) {
+      e.preventDefault();
+      if (posCart.length === 0) {
+        alert('কার্টে কোনো ঔষধ যোগ করা হয়নি।');
+        return;
+      }
+
+      const pName = document.getElementById('pos-patient-name').value;
+      const uhid = document.getElementById('pos-patient-uhid').value;
+      const method = document.getElementById('pos-payment-method').value;
+
+      let subtotal = 0;
+      posCart.forEach(i => subtotal += (i.qty * i.unit_price));
+      const vat = subtotal * 0.05;
+      const total = subtotal + vat;
+
+      try {
+        const invoice = HMS.Storage.createPharmacySale({
+          patient_name: pName,
+          uhid: uhid,
+          items: posCart,
+          subtotal: subtotal,
+          vat: vat,
+          total: total,
+          paid_amount: total,
+          payment_method: method
+        });
+
+        HMS.UI.showToast(`ফার্মেসি বিক্রয় সফল! ইনভয়েস নং: ${invoice.invoice_no}`, 'success');
+        posCart = [];
+        renderPosCart();
+        loadPharmacyData();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function openNewMedicineModal() {
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('nm-expiry').value = today;
+      newMedModalInstance = new bootstrap.Modal(document.getElementById('newMedicineModal'));
+      newMedModalInstance.show();
+    }
+
+    function handleNewMedicine(e) {
+      e.preventDefault();
+      const newMed = {
+        id: `MED-${String(medicinesList.length + 1).padStart(2, '0')}`,
+        brand: document.getElementById('nm-brand').value,
+        generic: document.getElementById('nm-generic').value,
+        company: 'Square / Beximco Pharma',
+        form: 'Tablet',
+        category: 'General',
+        batch: document.getElementById('nm-batch').value,
+        stock: Number(document.getElementById('nm-stock').value),
+        unit_price: Number(document.getElementById('nm-price').value),
+        buy_price: Number(document.getElementById('nm-price').value) * 0.8,
+        expiry: document.getElementById('nm-expiry').value,
+        reorder_level: 50
+      };
+
+      HMS.Storage.insert('medicines', newMed);
+      newMedModalInstance.hide();
+      HMS.UI.showToast('নতুন ঔষধ স্টক সফলভাবে অন্তর্ভুক্ত হয়েছে!', 'success');
+      loadPharmacyData();
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>

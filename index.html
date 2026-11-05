@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>কেয়ারপয়েন্ট মাল্টিস্পেশালিটি হাসপাতাল ও রিসার্চ সেন্টার | CarePoint Hospital</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Hind Siliguri (Bengali) & Inter (English) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Custom Design System & Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/website.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+
+  <!-- Top Demo Banner (Global) -->
+  <div id="demo-banner-placeholder"></div>
+
+  <!-- Top Emergency Hotline Bar -->
+  <div id="public-topbar-placeholder"></div>
+
+  <!-- Main Navigation Bar -->
+  <div id="public-navbar-placeholder"></div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <div class="hero-badge">
+            <i class="bi bi-shield-check"></i>
+            <span>জেসিআই মানদণ্ডে প্রত্যয়িত টারশিয়ারি কেয়ার হাসপাতাল</span>
+          </div>
+          <h1 class="hero-title" id="hero-title">
+            উন্নত প্রযুক্তির চিকিৎসা ও মানবিক সেবায় বিশ্বস্ত প্রতিষ্ঠান
+          </h1>
+          <p class="hero-subtitle" id="hero-subtitle">
+            ২৪/৭ সার্বক্ষণিক জরুরি সেবা, অভিজ্ঞ অধ্যাপক ও বিশেষজ্ঞ চিকিৎসক দল, বিশ্বমানের আইসিইউ এবং অত্যাধুনিক ক্যাথেটারাইজেশন ল্যাব নিয়ে আমরা সর্বদা আপনার পাশে।
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="appointment.html" class="btn btn-hms-success btn-lg">
+              <i class="bi bi-calendar2-plus me-2"></i>অনলাইন অ্যাপয়েন্টমেন্ট
+            </a>
+            <a href="doctors.html" class="btn btn-outline-light btn-lg">
+              <i class="bi bi-search me-2"></i>ডাক্তার খুঁজুন
+            </a>
+            <a href="tel:10678" class="btn btn-danger btn-lg">
+              <i class="bi bi-telephone-outbound me-2"></i>হটলাইন: 10678
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <!-- Quick Appointment Card on Hero -->
+          <div class="quick-appointment-card">
+            <h4><i class="bi bi-clock-history me-2 text-hms-blue"></i>দ্রুত সিরিয়াল নিন</h4>
+            <p class="text-muted small mb-3">সহজেই বিশেষজ্ঞ ডাক্তারের চেম্বারে পরামর্শের সময় নির্ধারণ করুন</p>
+            <form id="hero-quick-apt-form" onsubmit="handleHeroQuickApt(event)">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">বিভাগ নির্বাচন করুন</label>
+                <select class="form-select" id="hero-dept-select" required onchange="updateHeroDoctorSelect()">
+                  <option value="">বিভাগ পছন্দ করুন...</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">চিকিৎসক নির্বাচন করুন</label>
+                <select class="form-select" id="hero-doctor-select" required>
+                  <option value="">প্রথমে বিভাগ পছন্দ করুন...</option>
+                </select>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <label class="form-label small fw-semibold">তারিখ</label>
+                  <input type="date" class="form-control" id="hero-date" required>
+                </div>
+                <div class="col-6">
+                  <label class="form-label small fw-semibold">রোগীর মোবাইল</label>
+                  <input type="tel" class="form-control" id="hero-phone" placeholder="017xxxxxxxx" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-hms-primary w-100">
+                <i class="bi bi-arrow-right-circle me-1"></i>সিরিয়াল নিশ্চিত করুন
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statistics Counter Ribbon -->
+  <div class="container">
+    <div class="stats-counter-bar">
+      <div class="row g-4 text-center text-md-start">
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-icon blue"><i class="bi bi-hospital"></i></div>
+            <div>
+              <div class="stat-number">৩৫০+</div>
+              <div class="stat-label">ইনপেশেন্ট বেড ও কেবিন</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-icon green"><i class="bi bi-person-heart"></i></div>
+            <div>
+              <div class="stat-number">৫০+</div>
+              <div class="stat-label">সিনিয়র বিশেষজ্ঞ চিকিৎসক</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-icon orange"><i class="bi bi-activity"></i></div>
+            <div>
+              <div class="stat-number">২৪/৭</div>
+              <div class="stat-label">জরুরি ট্রায়াজ ও আইসিইউ</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-item">
+            <div class="stat-icon navy"><i class="bi bi-hand-thumbs-up"></i></div>
+            <div>
+              <div class="stat-number">৯৮.৫%</div>
+              <div class="stat-label">রোগী সন্তুষ্টির হার</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hospital Introduction & About -->
+  <section class="py-5 my-3">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="badge bg-hms-blue mb-2 px-3 py-2">আমাদের পরিচিতি</span>
+          <h2 class="fw-bold text-hms-navy mb-3">মানসম্মত চিকিৎসা ও প্রযুক্তিগত উৎকর্ষতার সমন্বয়</h2>
+          <p class="text-muted leading-relaxed">
+            কেয়ারপয়েন্ট মাল্টিস্পেশালিটি হাসপাতাল ও গবেষণা কেন্দ্র বাংলাদেশের চিকিৎসাসেবায় এক অনন্য মাইলফলক। ধানমন্ডির মূল ক্যাম্পাস এবং উত্তরায় অবস্থিত স্পেশালাইজড উইংয়ের মাধ্যমে আমরা সর্বাধুনিক ডায়াগনস্টিক সুবিধা ও টারশিয়ারি কেয়ার প্রদান করে আসছি।
+          </p>
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <span class="fw-semibold">আধুনিক ক্যাথল্যাব ও কার্ডিয়াক ইউনিট</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <span class="fw-semibold">সম্পূর্ণ স্বয়ংক্রিয় প্যাথলজি ল্যাব (LIS)</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <span class="fw-semibold">লেভেল-৩ ইনটেনসিভ কেয়ার ইউনিট (ICU)</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                <span class="fw-semibold">২৪/৭ লাইফ সাপোর্ট অ্যাম্বুলেন্স বহর</span>
+              </div>
+            </div>
+          </div>
+          <a href="about.html" class="btn btn-hms-primary">
+            হাসপাতাল সম্পর্কে বিস্তারিত জানুন <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="hms-card text-center p-4 h-100 bg-white">
+                <i class="bi bi-shield-shaded text-hms-blue fs-1 mb-2"></i>
+                <h5 class="fw-bold text-hms-navy">নির্ভরযোগ্য ও নিরাপদ</h5>
+                <p class="small text-muted mb-0">সর্বোচ্চ জীবাণুমুক্ত পরিবেশ ও আন্তর্জাতিক মানসম্পন্ন প্রটোকল</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="hms-card text-center p-4 h-100 bg-white">
+                <i class="bi bi-cpu text-hms-green fs-1 mb-2"></i>
+                <h5 class="fw-bold text-hms-navy">ডিজিটাল হেলথকেয়ার</h5>
+                <p class="small text-muted mb-0">পেপারলেস ইএইচআর, মোবাইল রিপোর্ট ও ডিজিটাল প্রেসক্রিপশন</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="hms-card text-center p-4 h-100 bg-white">
+                <i class="bi bi-cash-stack text-warning fs-1 mb-2"></i>
+                <h5 class="fw-bold text-hms-navy">স্বচ্ছ বিলিং ব্যবস্থা</h5>
+                <p class="small text-muted mb-0">কোনো লুকানো খরচ নেই, সহজ কিস্তি ও ইনস্যুরেন্স ক্লেইম সুবিধা</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="hms-card text-center p-4 h-100 bg-white">
+                <i class="bi bi-heart-pulse-fill text-danger fs-1 mb-2"></i>
+                <h5 class="fw-bold text-hms-navy">জরুরি রেসকিউ টিম</h5>
+                <p class="small text-muted mb-0">অন-কল কার্ডিওলজিস্ট ও জরুরি ট্রমা সার্জন সার্বক্ষণিক প্রস্তুত</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Departments Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+        <div>
+          <span class="badge bg-hms-blue mb-2 px-3 py-2">বিশেষায়িত বিভাগসমূহ</span>
+          <h2 class="fw-bold text-hms-navy mb-1">আমাদের ক্লিনিকাল ডিপার্টমেন্টস</h2>
+          <p class="text-muted mb-0">অভিজ্ঞ বিশেষজ্ঞ চিকিৎসকের তত্ত্বাবধানে প্রতিটি বিভাগে পূর্ণাঙ্গ চিকিৎসাসেবা</p>
+        </div>
+        <a href="departments.html" class="btn btn-outline-primary">
+          সকল বিভাগ দেখুন <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="row g-4" id="home-departments-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Doctors Section -->
+  <section class="py-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+        <div>
+          <span class="badge bg-hms-green mb-2 px-3 py-2">বিশেষজ্ঞ চিকিৎসকবৃন্দ</span>
+          <h2 class="fw-bold text-hms-navy mb-1">আমাদের পরামর্শক চিকিৎসক দল</h2>
+          <p class="text-muted mb-0">দেশ-বিদেশের স্বনামধন্য ডিগ্রিসম্পন্ন প্রখ্যাত বিশেষজ্ঞগণ</p>
+        </div>
+        <a href="doctors.html" class="btn btn-outline-success">
+          সকল ডাক্তার ও শিডিউল <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="row g-4" id="home-doctors-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Diagnostic & Health Packages -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge bg-hms-blue mb-2 px-3 py-2">প্রতিরোধমূলক স্বাস্থ্য সুরক্ষা</span>
+        <h2 class="fw-bold text-hms-navy">সাশ্রয়ী হেলথ প্যাকেজসমূহ</h2>
+        <p class="text-muted">নিয়মিত স্বাস্থ্য পরীক্ষায় প্রাথমিক পর্যায়েই রোগ শনাক্ত করুন ও সুস্থ থাকুন</p>
+      </div>
+      <div class="row g-4" id="home-packages-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Patient Testimonials -->
+  <section class="py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="badge bg-hms-green mb-2 px-3 py-2">রোগীদের অভিজ্ঞতা</span>
+        <h2 class="fw-bold text-hms-navy">রোগী ও তাদের স্বজনদের মতামত</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="hms-card p-4 h-100">
+            <div class="text-warning mb-3">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            </div>
+            <p class="text-muted small italic">"অধ্যাপক ডা. মিজানুর রহমানের চিকিৎসায় আমার বাবার হার্ট ব্লকেজের সফল স্টেন্টিং সম্পন্ন হয়েছে। হাসপাতালটির আইসিইউ ও নার্সিং সেবা অতুলনীয়।"</p>
+            <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+              <div class="user-avatar-sm bg-primary">ক</div>
+              <div>
+                <h6 class="mb-0 fw-bold">কাজী ফয়সাল</h6>
+                <small class="text-muted">ধানমন্ডি, ঢাকা</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="hms-card p-4 h-100">
+            <div class="text-warning mb-3">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            </div>
+            <p class="text-muted small italic">"অনলাইন পোর্টালে একই দিনে ল্যাব টেস্ট রিপোর্ট দেখার ব্যবস্থা খুবই সুবিধাজনক। ফ্রন্ট ডেস্ক ও রিসেপশনের আন্তরিক আচরণ প্রশংসনীয়।"</p>
+            <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+              <div class="user-avatar-sm bg-success">স</div>
+              <div>
+                <h6 class="mb-0 fw-bold">সাবরিনা আক্তার</h6>
+                <small class="text-muted">মিরপুর, ঢাকা</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="hms-card p-4 h-100">
+            <div class="text-warning mb-3">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            </div>
+            <p class="text-muted small italic">"জরুরি বিভাগে আসার ৫ মিনিটের মধ্যে ট্রায়াজ ও চিকিৎসা শুরু হয়েছিল। বিলিং ও ক্লেইমের স্বচ্ছতা দেখে অত্যন্ত সন্তুষ্ট হয়েছি।"</p>
+            <div class="d-flex align-items-center gap-3 mt-3 pt-3 border-top">
+              <div class="user-avatar-sm bg-info">র</div>
+              <div>
+                <h6 class="mb-0 fw-bold">মো. রফিকুল ইসলাম</h6>
+                <small class="text-muted">লালমাটিয়া, ঢাকা</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Health Articles & Latest News -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+        <div>
+          <span class="badge bg-hms-blue mb-2 px-3 py-2">স্বাস্থ্য ব্লগ ও খবর</span>
+          <h2 class="fw-bold text-hms-navy mb-1">সর্বশেষ স্বাস্থ্য পরামর্শ ও সংবাদ</h2>
+        </div>
+        <a href="health-library.html" class="btn btn-outline-primary">
+          সকল আর্টিকেল <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="row g-4" id="home-articles-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Emergency & Map Contact Box -->
+  <section class="py-5">
+    <div class="container">
+      <div class="hms-card p-4 p-lg-5 bg-hms-navy text-white">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <span class="badge bg-danger mb-2 px-3 py-2">২৪ ঘণ্টা জরুরি সেবা</span>
+            <h2 class="fw-bold text-white mb-3">মেডিকেল ইমার্জেন্সিতে আমরা এক ক্লিকেই প্রস্তুত</h2>
+            <p class="text-light opacity-75 mb-4">
+              হৃদরোগের তীব্র ব্যথা, সড়ক দুর্ঘটনা, স্ট্রোক কিংবা শ্বাসকষ্টে আমাদের সার্বক্ষণিক অ্যাডভান্সড লাইফ সাপোর্ট অ্যাম্বুলেন্স ও ট্রায়াজ টিমকে অবিলম্বে অবহিত করুন।
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="tel:10678" class="btn btn-danger btn-lg">
+                <i class="bi bi-telephone-fill me-2"></i>হটলাইন: 10678
+              </a>
+              <a href="tel:+8801711000999" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-truck-front-fill me-2"></i>জরুরি অ্যাম্বুলেন্স: 01711-000999
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="p-4 bg-white text-dark rounded-4 shadow">
+              <h5 class="fw-bold text-hms-navy mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i>হাসপাতালের ঠিকানা</h5>
+              <p class="small text-muted mb-2">প্লট ১৮, রোড ৭, ধানমন্ডি, ঢাকা ১২০৫, বাংলাদেশ</p>
+              <div class="ratio ratio-16x9 rounded overflow-hidden border">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.1979435061614!2d90.37254587602263!3d23.740321289163273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8b7a44f7725%3A0xb351e3c834a317e3!2sDhanmondi%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1714500000000!5m2!1sen!2sbd" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Doctor Profile Modal -->
+  <div class="modal fade" id="doctorProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" id="doctor-modal-content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Footer -->
+  <div id="public-footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Core HMS Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/website.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <!-- Page Specific Homepage Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.Website.initNavbarAndFooter('home');
+      renderHomepageContent();
+    });
+
+    function renderHomepageContent() {
+      const depts = HMS.Storage.getCollection('departments');
+      const docs = HMS.Storage.getCollection('doctors');
+      const pkgs = HMS.SEED_DATA.cms.packages;
+      const articles = HMS.SEED_DATA.cms.news_and_articles;
+
+      // 1. Populate Hero Dept Select
+      const heroDeptSelect = document.getElementById('hero-dept-select');
+      if (heroDeptSelect) {
+        heroDeptSelect.innerHTML = '<option value="">বিভাগ পছন্দ করুন...</option>' + 
+          depts.map(d => `<option value="${d.id}">${d.name_bn}</option>`).join('');
+      }
+      const todayDate = new Date().toISOString().slice(0, 10);
+      const dateEl = document.getElementById('hero-date');
+      if (dateEl) {
+        dateEl.min = todayDate;
+        dateEl.value = todayDate;
+      }
+
+      // 2. Render Featured Departments
+      const deptGrid = document.getElementById('home-departments-grid');
+      if (deptGrid) {
+        deptGrid.innerHTML = depts.slice(0, 8).map(d => `
+          <div class="col-xl-3 col-lg-4 col-sm-6">
+            <div class="department-card">
+              <div class="department-icon">
+                <i class="bi ${d.icon}"></i>
+              </div>
+              <h5 class="department-title">${d.name_bn}</h5>
+              <p class="department-desc">${d.name_en} - ফ্লোর: ${d.floor}</p>
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <span class="badge bg-light text-primary">${d.doctors_count || 4} জন চিকিৎসক</span>
+                <a href="doctors.html?dept=${d.id}" class="btn btn-sm btn-outline-primary">ডাক্তার দেখুন</a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 3. Render Featured Doctors
+      const docGrid = document.getElementById('home-doctors-grid');
+      if (docGrid) {
+        docGrid.innerHTML = docs.slice(0, 4).map(doc => `
+          <div class="col-lg-3 col-sm-6">
+            <div class="doctor-card">
+              <div class="doctor-image-wrapper">
+                <i class="bi bi-person-fill doctor-placeholder-avatar"></i>
+                <span class="doctor-dept-badge">${doc.dept_name}</span>
+              </div>
+              <div class="doctor-info">
+                <h5 class="doctor-name">${doc.name_bn}</h5>
+                <div class="doctor-degrees">${doc.degrees}</div>
+                <div class="doctor-details-list">
+                  <div><i class="bi bi-clock me-1 text-primary"></i>${doc.schedule}</div>
+                  <div><i class="bi bi-geo-alt me-1 text-muted"></i>রুম: ${doc.room}</div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <div>
+                    <small class="text-muted d-block">পরামর্শ ফি</small>
+                    <span class="doctor-fee">${HMS.I18n.formatCurrency(doc.fee)}</span>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="viewDoctorDetails('${doc.id}')">প্রোফাইল</button>
+                    <a href="appointment.html?doc=${doc.id}" class="btn btn-sm btn-hms-primary">সিরিয়াল</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 4. Render Health Packages
+      const pkgGrid = document.getElementById('home-packages-grid');
+      if (pkgGrid) {
+        pkgGrid.innerHTML = pkgs.map(p => `
+          <div class="col-lg-4 col-md-6">
+            <div class="package-card ${p.featured ? 'featured' : ''}">
+              ${p.featured ? '<span class="package-badge">জনপ্রিয় প্যাকেজ</span>' : ''}
+              <h4 class="fw-bold text-hms-navy mb-1">${p.title_bn}</h4>
+              <small class="text-muted">${p.title_en}</small>
+              <div class="package-price">
+                ${HMS.I18n.formatCurrency(p.price)}
+                <span class="fs-6 text-decoration-line-through text-muted fw-normal ms-2">${HMS.I18n.formatCurrency(p.original_price)}</span>
+              </div>
+              <ul class="package-features">
+                ${p.tests.map(t => `<li><i class="bi bi-check-circle-fill"></i> ${t}</li>`).join('')}
+              </ul>
+              <a href="appointment.html?pkg=${p.id}" class="btn ${p.featured ? 'btn-hms-primary' : 'btn-outline-primary'} w-100 mt-auto">
+                প্যাকেজটি বুক করুন
+              </a>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 5. Render Health Articles
+      const artGrid = document.getElementById('home-articles-grid');
+      if (artGrid) {
+        artGrid.innerHTML = articles.map(art => `
+          <div class="col-lg-4 col-md-6">
+            <div class="hms-card h-100 p-4">
+              <span class="badge bg-info text-dark mb-2 align-self-start">${art.category}</span>
+              <h5 class="fw-bold text-hms-navy mb-2">${art.title_bn}</h5>
+              <p class="text-muted small flex-grow-1">${art.excerpt_bn}</p>
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top text-muted small">
+                <span><i class="bi bi-person me-1"></i>${art.author}</span>
+                <span><i class="bi bi-calendar3 me-1"></i>${art.date}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function updateHeroDoctorSelect() {
+      const deptId = document.getElementById('hero-dept-select').value;
+      const docSelect = document.getElementById('hero-doctor-select');
+      const docs = HMS.Storage.getCollection('doctors');
+      const filtered = docs.filter(d => !deptId || d.dept_id === deptId);
+      docSelect.innerHTML = '<option value="">চিকিৎসক নির্বাচন করুন...</option>' + 
+        filtered.map(d => `<option value="${d.id}">${d.name_bn} (${d.designation})</option>`).join('');
+    }
+
+    function handleHeroQuickApt(e) {
+      e.preventDefault();
+      const deptSelect = document.getElementById('hero-dept-select');
+      const docSelect = document.getElementById('hero-doctor-select');
+      const date = document.getElementById('hero-date').value;
+      const phone = document.getElementById('hero-phone').value;
+
+      if (!deptSelect.value || !docSelect.value) {
+        alert('অনুগ্রহ করে বিভাগ ও চিকিৎসক নির্বাচন করুন।');
+        return;
+      }
+      window.location.href = `appointment.html?dept=${deptSelect.value}&doc=${docSelect.value}&date=${date}&phone=${phone}`;
+    }
+
+    function viewDoctorDetails(docId) {
+      const doc = HMS.Storage.getById('doctors', docId);
+      if (!doc) return;
+      const modalEl = document.getElementById('doctor-modal-content');
+      modalEl.innerHTML = `
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-hms-navy">${doc.name_bn}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <div class="col-md-4 text-center">
+              <div class="p-4 bg-light rounded-3 mb-2">
+                <i class="bi bi-person-circle fs-1 text-primary"></i>
+              </div>
+              <span class="badge bg-success">${doc.status}</span>
+              <div class="mt-2 text-warning">
+                <i class="bi bi-star-fill"></i> ${doc.rating} / 5.0
+              </div>
+            </div>
+            <div class="col-md-8">
+              <h5 class="fw-bold text-hms-navy">${doc.name_bn}</h5>
+              <div class="text-primary fw-semibold mb-2">${doc.degrees}</div>
+              <div class="text-muted small mb-3">${doc.designation}</div>
+              <p class="small text-muted mb-3">${doc.bio}</p>
+              <div class="p-3 bg-light rounded-3 mb-3 small">
+                <div><strong>চেম্বার শিডিউল:</strong> ${doc.schedule}</div>
+                <div><strong>রুম নং:</strong> ${doc.room}</div>
+                <div><strong>অভিজ্ঞতা:</strong> ${doc.experience}</div>
+                <div><strong>পরামর্শ ফি:</strong> ${HMS.I18n.formatCurrency(doc.fee)}</div>
+              </div>
+              <a href="appointment.html?doc=${doc.id}" class="btn btn-hms-primary w-100">
+                এই ডাক্তারের সাথে অ্যাপয়েন্টমেন্ট নিন
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('doctorProfileModal'));
+      modal.show();
+    }
+  </script>
+</body>
+</html>

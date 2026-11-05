@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>আমার বিল ও অনলাইন পেমেন্ট | CarePoint Patient Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar patient-sidebar" id="patient-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="patient-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-wallet2 text-success me-2"></i>আমার ইনভয়েস ও অনলাইন পেমেন্ট ডেমো</h4>
+            <p class="text-muted small mb-0">হাসপাতালের সেবা বিল, ল্যাবরেটরি ফি ও ডিজিটাল পেমেন্ট ট্র্যাকিং</p>
+          </div>
+        </div>
+
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0">সকল ইনভয়েস তালিকা</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>ইনভয়েস নং</th>
+                  <th>তারিখ</th>
+                  <th>বিবরণী</th>
+                  <th>মোট বিল</th>
+                  <th>পরিশোধিত</th>
+                  <th>বকেয়া</th>
+                  <th>অবস্থা</th>
+                  <th class="no-export text-end">অ্যাকশন</th>
+                </tr>
+              </thead>
+              <tbody id="my-bills-tbody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderPatientSidebar('billing');
+      HMS.UI.renderPatientTopbar('বিল ও পেমেন্ট');
+      loadMyBills();
+    });
+
+    function loadMyBills() {
+      const uhid = 'CPH-2026-0001';
+      const invoices = HMS.Storage.getCollection('invoices').filter(i => i.uhid === uhid);
+      const tbody = document.getElementById('my-bills-tbody');
+
+      if (invoices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-muted">কোনো ইনভয়েস পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = invoices.map(inv => `
+        <tr>
+          <td><span class="badge bg-secondary">${inv.invoice_no}</span></td>
+          <td><small>${inv.date}</small></td>
+          <td><small>${inv.items.map(it => it.desc).join(', ')}</small></td>
+          <td><strong>${HMS.I18n.formatCurrency(inv.total)}</strong></td>
+          <td class="text-success">${HMS.I18n.formatCurrency(inv.paid_amount)}</td>
+          <td class="${inv.due_amount > 0 ? 'text-danger fw-bold' : 'text-muted'}">${HMS.I18n.formatCurrency(inv.due_amount)}</td>
+          <td><span class="badge ${inv.status === 'Paid' ? 'bg-success' : 'bg-warning'}">${inv.status}</span></td>
+          <td class="text-end no-export">
+            ${inv.due_amount > 0 ? `
+              <button class="btn btn-sm btn-hms-success" onclick="payBillOnline('${inv.id}')">
+                <i class="bi bi-credit-card me-1"></i>বিকাশ / পে
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-outline-secondary" onclick="printPatientReceipt('${inv.id}')">
+                <i class="bi bi-printer"></i> রসিদ
+              </button>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function payBillOnline(invId) {
+      const inv = HMS.Storage.getById('invoices', invId);
+      if (!inv) return;
+      const method = prompt('পেমেন্ট মাধ্যম বেছে নিন (bKash / Nagad / Card):', 'bKash');
+      if (method) {
+        HMS.Storage.recordInvoicePayment(invId, inv.due_amount, method);
+        HMS.UI.showToast(`অনলাইন পেমেন্ট ডেমো সফল! বিল পরিশোধ সম্পন্ন হয়েছে।`, 'success');
+        loadMyBills();
+      }
+    }
+
+    function printPatientReceipt(id) {
+      const inv = HMS.Storage.getById('invoices', id);
+      if (!inv) return;
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head><title>Money Receipt - ${inv.invoice_no}</title><style>body{font-family:sans-serif; padding:30px;}</style></head>
+        <body onload="window.print()">
+          <h2>CarePoint Multispecialty Hospital</h2>
+          <h3>OFFICIAL PAYMENT RECEIPT</h3>
+          <p><strong>Invoice No:</strong> ${inv.invoice_no} | <strong>Date:</strong> ${inv.date}</p>
+          <p><strong>Patient:</strong> ${inv.patient_name} (${inv.uhid})</p>
+          <p><strong>Paid Amount:</strong> ৳${inv.paid_amount} (${inv.payment_method})</p>
+          <p><strong>Due Balance:</strong> ৳${inv.due_amount}</p>
+          <small>Thank you for choosing CarePoint Hospital. 24/7 Helpline: 10678</small>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+/**
+ * Hospital Management System (HMS) - Dashboard Styles
+ * Admin & Patient Portal Layouts, Sidebars, Bed Maps & Clinical Components
+ */
+
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--hms-bg);
+}
+
+/* Sidebar */
+.hms-sidebar {
+  width: var(--hms-sidebar-width);
+  background-color: var(--hms-navy);
+  color: #cbd5e1;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  transition: var(--hms-transition);
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar for Sidebar */
+.hms-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.hms-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.sidebar-header {
+  height: var(--hms-topbar-height);
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hms-navy-dark);
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.sidebar-nav {
+  padding: 1rem 0.75rem 2rem;
+  flex-grow: 1;
+}
+.sidebar-heading {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  font-weight: 700;
+  padding: 0.85rem 0.75rem 0.35rem;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--hms-radius-md);
+  margin-bottom: 2px;
+  transition: var(--hms-transition);
+  text-decoration: none;
+}
+.sidebar-link i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sidebar-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+.sidebar-link.active {
+  color: #ffffff;
+  background: var(--hms-blue);
+  box-shadow: 0 4px 12px rgba(22, 119, 200, 0.3);
+}
+
+.sidebar-badge {
+  margin-left: auto;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* Main Dashboard Area */
+.hms-main-content {
+  flex-grow: 1;
+  margin-left: var(--hms-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: var(--hms-transition);
+}
+
+/* Topbar */
+.hms-topbar {
+  height: var(--hms-topbar-height);
+  background: #ffffff;
+  border-bottom: 1px solid var(--hms-border);
+  padding: 0 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Dashboard Body */
+.dashboard-content {
+  padding: 1.75rem;
+  flex-grow: 1;
+}
+
+/* Stat Cards */
+.stat-card {
+  background: #ffffff;
+  border: 1px solid var(--hms-border-light);
+  border-radius: var(--hms-radius-lg);
+  padding: 1.25rem 1.4rem;
+  box-shadow: var(--hms-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--hms-transition);
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--hms-shadow-md);
+}
+.stat-card-info h6 {
+  font-size: 0.82rem;
+  color: var(--hms-text-muted);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.stat-card-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--hms-navy);
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+}
+.stat-card-sub {
+  font-size: 0.78rem;
+  color: var(--hms-text-muted);
+}
+.stat-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--hms-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.stat-card-icon.blue { background-color: var(--hms-blue-light); color: var(--hms-blue); }
+.stat-card-icon.green { background-color: var(--hms-green-light); color: var(--hms-green); }
+.stat-card-icon.orange { background-color: var(--hms-warning-light); color: var(--hms-warning); }
+.stat-card-icon.red { background-color: var(--hms-danger-light); color: var(--hms-danger); }
+.stat-card-icon.navy { background-color: #f1f5f9; color: var(--hms-navy); }
+
+/* Bed Grid Matrix */
+.bed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem;
+}
+.bed-card {
+  border-radius: var(--hms-radius-md);
+  padding: 0.85rem;
+  text-align: center;
+  border: 1.5px solid var(--hms-border);
+  background: #ffffff;
+  cursor: pointer;
+  transition: var(--hms-transition);
+}
+.bed-card:hover {
+  box-shadow: var(--hms-shadow-sm);
+  transform: translateY(-2px);
+}
+.bed-card.available {
+  border-color: #86efac;
+  background-color: #f0fdf4;
+}
+.bed-card.occupied {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+}
+.bed-card.maintenance {
+  border-color: #fde047;
+  background-color: #fefce8;
+}
+.bed-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+}
+.bed-card.available .bed-icon { color: var(--hms-success); }
+.bed-card.occupied .bed-icon { color: var(--hms-danger); }
+.bed-card.maintenance .bed-icon { color: var(--hms-warning); }
+
+.bed-number {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--hms-navy);
+}
+.bed-type {
+  font-size: 0.72rem;
+  color: var(--hms-text-muted);
+}
+.bed-patient {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--hms-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.25rem;
+}
+
+/* Triage Badges */
+.triage-badge {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--hms-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.triage-red {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #f87171;
+}
+.triage-yellow {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+.triage-green {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+/* Role pill in topbar */
+.role-badge-pill {
+  background: var(--hms-blue-light);
+  color: var(--hms-blue);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* User profile avatar */
+.user-avatar-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--hms-navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Clinical Prescription Sheet Layout */
+.prescription-paper {
+  background: #ffffff;
+  border: 1px solid var(--hms-border);
+  border-radius: var(--hms-radius-lg);
+  padding: 2.5rem;
+  max-width: 850px;
+  margin: 0 auto;
+  box-shadow: var(--hms-shadow-md);
+}
+.rx-symbol {
+  font-size: 2.25rem;
+  font-weight: 800;
+  font-family: serif;
+  color: var(--hms-blue);
+}
+
+/* Clinical Invoice Sheet Layout */
+.invoice-paper {
+  background: #ffffff;
+  border: 1px solid var(--hms-border);
+  border-radius: var(--hms-radius-lg);
+  padding: 2.5rem;
+  max-width: 850px;
+  margin: 0 auto;
+  box-shadow: var(--hms-shadow-md);
+}
+
+/* Patient Portal Navigation */
+.patient-sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid var(--hms-border);
+}
+.patient-sidebar .sidebar-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--hms-border);
+}
+.patient-sidebar .sidebar-brand {
+  color: var(--hms-navy);
+}
+.patient-sidebar .sidebar-link {
+  color: var(--hms-text);
+}
+.patient-sidebar .sidebar-link:hover {
+  background-color: var(--hms-blue-light);
+  color: var(--hms-blue);
+}
+.patient-sidebar .sidebar-link.active {
+  background-color: var(--hms-blue);
+  color: #ffffff;
+}

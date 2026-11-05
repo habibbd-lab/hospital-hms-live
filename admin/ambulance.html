@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অ্যাম্বুলেন্স সার্ভিস ও ট্রিপ ম্যানেজমেন্ট | CarePoint HMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body>
+  <div id="demo-banner-placeholder"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="hms-sidebar" id="admin-sidebar-placeholder"></aside>
+    <main class="hms-main-content">
+      <header id="admin-topbar-placeholder"></header>
+
+      <div class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h4 class="fw-bold text-hms-navy mb-1"><i class="bi bi-truck-front-fill text-success me-2"></i>অ্যাম্বুলেন্স সার্ভিস ও বহর (Ambulance Management)</h4>
+            <p class="text-muted small mb-0">২৪/৭ লাইফ সাপোর্ট বহর, রিয়েলটাইম ডিসপ্যাচ ও জরুরি রোগী পরিবহন লগ</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-hms-primary btn-sm" onclick="openDispatchModal()">
+              <i class="bi bi-send-plus me-1"></i>জরুরি অ্যাম্বুলেন্স প্রেরণ (Dispatch)
+            </button>
+          </div>
+        </div>
+
+        <!-- Fleet Grid -->
+        <div class="row g-4 mb-4" id="ambulance-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Recent Trips Table -->
+        <div class="hms-card">
+          <div class="hms-card-header">
+            <h6 class="fw-bold text-hms-navy mb-0"><i class="bi bi-signpost-2 text-primary me-2"></i>সাম্প্রতিক ট্রিপ ও রেসকিউ হিস্ট্রি</h6>
+          </div>
+          <div class="hms-table-responsive">
+            <table class="hms-table">
+              <thead>
+                <tr>
+                  <th>তারিখ</th>
+                  <th>যানবাহন</th>
+                  <th>চালক</th>
+                  <th>পিকআপ স্থান</th>
+                  <th>গন্তব্য</th>
+                  <th>অবস্থা</th>
+                </tr>
+              </thead>
+              <tbody id="trip-history-body">
+                <tr>
+                  <td>২০২৬-১১-০৫ ১৫:৩০</td>
+                  <td>ঢাকা মেট্রো-ছ ৭১-৮৯৪৬ (ALS)</td>
+                  <td>মো. রফিক উদ্দিন</td>
+                  <td>উত্তরা সেক্টর ৭</td>
+                  <td>ধানমন্ডি মূল হাসপাতাল</td>
+                  <td><span class="badge bg-warning text-dark">অন-ট্রিপ (En route)</span></td>
+                </tr>
+                <tr>
+                  <td>২০২৬-১১-০৫ ০৯:১৫</td>
+                  <td>ঢাকা মেট্রো-ছ ৭১-৮৯৪৫ (ICU)</td>
+                  <td>মো. সুজন মিয়া</td>
+                  <td>মিরপুর ২</td>
+                  <td>ধানমন্ডি জরুরি বিভাগ</td>
+                  <td><span class="badge bg-success">সম্পন্ন (Delivered)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/seed-data.js"></script>
+  <script src="../assets/js/storage.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/components.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      HMS.UI.renderAdminSidebar('ambulance');
+      HMS.UI.renderAdminTopbar('অ্যাম্বুলেন্স সার্ভিস', [{ title: 'অপারেশন', url: '#' }, { title: 'অ্যাম্বুলেন্স', url: '#' }]);
+      renderFleet();
+    });
+
+    function renderFleet() {
+      const fleet = HMS.Storage.getCollection('ambulances');
+      const grid = document.getElementById('ambulance-grid');
+      grid.innerHTML = fleet.map(a => `
+        <div class="col-lg-4 col-md-6">
+          <div class="hms-card p-4 h-100 border-${a.status === 'Available' ? 'success' : 'warning'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-light text-primary border">${a.type}</span>
+              <span class="hms-badge ${a.status === 'Available' ? 'badge-active' : 'badge-pending'}">
+                <span class="hms-badge-dot"></span>${a.status}
+              </span>
+            </div>
+            <h5 class="fw-bold text-hms-navy mb-1">${a.reg_no}</h5>
+            <div class="small text-muted mb-3"><i class="bi bi-tools me-1"></i>${a.equipment}</div>
+            <div class="p-3 bg-light rounded-3 mb-3 small">
+              <div><strong>দায়িত্বপ্রাপ্ত চালক:</strong> ${a.driver}</div>
+              <div><strong>মোবাইল:</strong> <a href="tel:${a.phone}">${a.phone}</a></div>
+              ${a.destination ? `<div><strong>বর্তমান গন্তব্য:</strong> ${a.destination}</div>` : ''}
+            </div>
+            <button class="btn btn-sm ${a.status === 'Available' ? 'btn-hms-success' : 'btn-outline-secondary'} w-100" onclick="toggleAmbulanceStatus('${a.id}')">
+              ${a.status === 'Available' ? 'ডিসপ্যাচ পাঠান' : 'ট্রিপ সম্পন্ন চিহ্নিত করুন'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleAmbulanceStatus(id) {
+      const amb = HMS.Storage.getById('ambulances', id);
+      if (!amb) return;
+      const newStatus = amb.status === 'Available' ? 'On Trip' : 'Available';
+      HMS.Storage.update('ambulances', id, { status: newStatus });
+      HMS.UI.showToast(`অ্যাম্বুলেন্স স্ট্যাটাস আপডেট: ${newStatus}`, 'success');
+      renderFleet();
+    }
+
+    function openDispatchModal() {
+      const loc = prompt('রোগীর বর্তমান অবস্থান (পিকআপ স্থান):', 'গুলশান ২');
+      if (loc) {
+        HMS.UI.showToast(`অ্যাম্বুলেন্স অবিলম্বে ${loc} এর উদ্দেশ্যে রওনা হয়েছে!`, 'success');
+      }
+    }
+  </script>
+</body>
+</html>
