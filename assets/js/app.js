@@ -34,3 +34,4 @@ HMS.App = {
 document.addEventListener('DOMContentLoaded', () => {
   HMS.App.init();
 });
+

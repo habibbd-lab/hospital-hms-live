@@ -37,3 +37,4 @@ When upgrading to a production Laravel + MySQL deployment, the following changes
 4. **Authorization:** Implement Laravel Policies and Spatie Permissions for server-side role validation.
 5. **Secure Storage:** Store medical scans and uploaded files in S3 or protected private disks with signed URLs.
 6. **Background Queues:** Use Redis and Laravel Queues for background SMS/Email reminders and daily automated database backups.
+

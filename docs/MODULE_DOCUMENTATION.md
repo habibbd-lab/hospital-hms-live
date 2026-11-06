@@ -178,3 +178,4 @@ This document details the functional specifications, workflows, and state transi
 - **User Accounts:** Directory of all 13 demo role accounts.
 - **RBAC Matrix:** Visual matrix of module permissions per role.
 - **Data Engine:** 1-click JSON backup export, JSON backup import, and demo data reset.
+

@@ -46,3 +46,4 @@ This test suite verifies the functionality, data persistence, business logic, re
 ### 4. Browser Compatibility
 - Tested and verified on Chromium (Chrome, Edge, Brave), Gecko (Firefox), and WebKit (Safari).
 - UTF-8 character encoding verified for proper Bangla (বাংলা) font rendering without broken glyphs.
+

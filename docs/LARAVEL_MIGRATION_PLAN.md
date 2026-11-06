@@ -117,3 +117,4 @@ In Laravel, critical hospital operations must be wrapped in `DB::transaction()` 
 - Sanitize HTML inputs and enforce CSRF token verification.
 - Encrypt sensitive patient personal data columns (`nid`, `phone`, `medical_notes`) using Laravel's `$casts = ['nid' => 'encrypted']`.
 - Maintain immutable `audit_logs` tracking every clinical document access.
+

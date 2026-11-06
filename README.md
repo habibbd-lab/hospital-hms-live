@@ -188,3 +188,4 @@ For complete details on transitioning to a production Laravel 11.x + MySQL stack
 
 Designed and engineered for **CarePoint Multispecialty Hospital & Research Center** as a demonstration of high-standard frontend healthcare architecture.
 All sample names, telephone numbers, and clinical details in demo data are purely fictional.
+

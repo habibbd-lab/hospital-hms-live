@@ -60,3 +60,4 @@ HMS.CONFIG = {
     PRESCRIPTION: ['Active', 'Dispensed', 'Expired']
   }
 };
+

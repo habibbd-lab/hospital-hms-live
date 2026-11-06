@@ -57,3 +57,4 @@ The storage key in the browser is:
    - Calling `HMS.Storage.importJSON(jsonString)` validates the presence of required collections before saving to LocalStorage.
 3. **Resetting Demo Data:**
    - Calling `HMS.Storage.resetToSeed()` restores the initial seed data from `HMS.SEED_DATA` without requiring a browser cache clear.
+

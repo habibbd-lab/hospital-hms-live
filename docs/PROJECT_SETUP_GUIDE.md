@@ -98,3 +98,4 @@ At the top of every page, the blue **Demo Mode Bar** provides 1-click tools:
 - **Export Data (JSON):** Downloads a full `.json` file containing all patient, doctor, appointment, bed, invoice, and laboratory records.
 - **Import Data (JSON):** Restores or loads any valid JSON dataset into LocalStorage.
 - **Reset Demo Data:** Re-seeds the system back to its original realistic Bangladeshi healthcare sample dataset.
+

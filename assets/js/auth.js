@@ -108,3 +108,4 @@ HMS.Auth = {
     return modules.includes(moduleKey);
   }
 };
+

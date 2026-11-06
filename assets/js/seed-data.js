@@ -796,3 +796,4 @@ HMS.SEED_DATA = {
     { id: 'NOTIF-04', type: 'Pharmacy', title: 'স্বল্প স্টক সতর্কতা (Low Stock Alert)', desc: 'Ceclor 250 Syrup এর স্টক ৩০ ইউনিটের নিচে নেমে গেছে। অবিলম্বে সংগ্রহ প্রয়োজন।', time: '৪ ঘণ্টা আগে', unread: false }
   ]
 };
+
